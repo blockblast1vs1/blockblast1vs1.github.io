@@ -444,5 +444,5 @@
 
   log.info('ImageBundleLoader v1 initialized');
   // 为了和 json 方案一致：默认开启记录（你也可以在控制台关掉）
-  ImageBundleLoader.setRecording(true);
+  ImageBundleLoader.setRecording(false);
 })();

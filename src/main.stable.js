@@ -199,8 +199,11 @@ window.boot = function () {
         // more tasks simultaneously may cause performance draw back on some android system / browsers.
         // You can adjust the number based on your own test result, you have to set it before any loading process to take effect.
         if (cc.sys.isBrowser && cc.sys.os === cc.sys.OS_ANDROID) {
-            cc.assetManager.downloader.maxConcurrency = 2;
-            cc.assetManager.downloader.maxRequestsPerFrame = 2;
+            cc.assetManager.downloader.maxConcurrency = 4;
+            cc.assetManager.downloader.maxRequestsPerFrame = 4;
+        } else if (cc.sys.isBrowser) {
+            cc.assetManager.downloader.maxConcurrency = 8;
+            cc.assetManager.downloader.maxRequestsPerFrame = 6;
         }
 
         var launchScene = settings.launchScene;
@@ -258,7 +261,12 @@ window.boot = function () {
         }
     }
 
-    cc.assetManager.loadScript(settings.jsList.map(function (x) { return 'src/' + x;}), cb);
+    var jsList = settings.jsList || [];
+    if (jsList.length) {
+        cc.assetManager.loadScript(jsList.map(function (x) { return 'src/' + x; }), cb);
+    } else {
+        cb();
+    }
 
     for (var i = 0; i < bundleRoot.length; i++) {
         cc.assetManager.loadBundle(bundleRoot[i], cb);

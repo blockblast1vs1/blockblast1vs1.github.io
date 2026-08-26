@@ -370,5 +370,5 @@
     }
     
     log.info('JsonBundleLoader v2 initialized');
-    JsonBundleLoader.setRecording(true);
+    JsonBundleLoader.setRecording(false);
 })();

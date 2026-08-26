@@ -13,12 +13,8 @@ window._CCSettings = {
     launchScene: "db://assets/scene/StartScene.fire",
     orientation: "",
     server: "",
-    jsList: [
-        "assets/games/pvp/proto/protobuf.min.js",
-        "assets/games/pvp/proto/protobufpvp.js",
-        "assets/games/pvp/proto/peerjs.min.js",
-        "assets/scripts/func/LoginSever/axios.min.js"
-    ],
+    // PvP/network libs load lazily when entering PvP (faster first paint)
+    jsList: [],
     bundleVers: {},
     debug: false
 };

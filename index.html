@@ -4,12 +4,24 @@
     <meta charset="utf-8" />
 
   <title>Block Blast 1vs1</title>
+  <!-- Start biggest downloads ASAP (compete less with PvP / fonts) -->
+  <link rel="preload" href="src/cocos2d-js-min.js" as="script" />
+  <link rel="preload" href="assets/main/index.js" as="script" />
+  <link rel="preload" href="assets/main/config.json" as="fetch" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
     rel="stylesheet"
+    media="print"
+    onload="this.media='all'"
   />
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </noscript>
 
   <!--http://www.html5rocks.com/en/mobile/mobifying/-->
     <meta

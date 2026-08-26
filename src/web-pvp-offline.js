@@ -3,7 +3,7 @@
  * - Home: hide Adventure, show PvP; click → Online / Bot modal
  * - Always loads assets/pvp/index.js (single bundle — no index.offline.js swap)
  * - Online / Bot = runtime flags only (pvp_play_bot + __PVP_FORCE_OFFLINE)
- * - Prefetches both index.js and index.offline.js into HTTP cache
+ * - No boot-time prefetch (keeps first load fast); deps load on enterPvp
  */
 (function () {
   'use strict';
@@ -11,6 +11,7 @@
   // Runtime mode: false = Online (PeerJS), true = Bot (OfflineClient)
   var FORCE_OFFLINE = false;
   var pvpBundleReady = false;
+  var pvpDepsPromise = null;
 
   try {
     localStorage.setItem('open_pvp', '1');
@@ -21,6 +22,13 @@
   } catch (e) {}
 
   var PVP_WS_RE = /pvp-global\.blockblast\.com|:22601/i;
+
+  var PVP_DEPS = [
+    'src/assets/games/pvp/proto/protobuf.min.js',
+    'src/assets/games/pvp/proto/protobufpvp.js',
+    'src/assets/games/pvp/proto/peerjs.min.js',
+    'src/assets/scripts/func/LoginSever/axios.min.js',
+  ];
 
   function isBotMode() {
     return !!FORCE_OFFLINE;
@@ -41,23 +49,34 @@
     );
   }
 
-  /** Warm HTTP cache for both entry scripts (only index.js is executed). */
-  function prefetchBothIndexes() {
-    var bases = ['assets/pvp/index.js', 'assets/pvp/index.offline.js'];
-    bases.forEach(function (url) {
-      try {
-        if (window.fetch) {
-          fetch(url, { credentials: 'same-origin', cache: 'force-cache' }).catch(
-            function () {}
-          );
-        } else {
-          var x = new XMLHttpRequest();
-          x.open('GET', url);
-          x.send();
-        }
-      } catch (e) {}
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.async = true;
+      s.charset = 'utf-8';
+      s.src = src;
+      s.onload = function () {
+        resolve();
+      };
+      s.onerror = function () {
+        reject(new Error('Failed to load ' + src));
+      };
+      document.head.appendChild(s);
     });
-    console.log('[web-pvp] prefetch index.js + index.offline.js');
+  }
+
+  /** Load PeerJS / protobuf / axios only when PvP is entered. */
+  function ensurePvpDeps() {
+    if (pvpDepsPromise) return pvpDepsPromise;
+    pvpDepsPromise = PVP_DEPS.reduce(function (chain, src) {
+      return chain.then(function () {
+        return loadScript(src);
+      });
+    }, Promise.resolve()).catch(function (err) {
+      pvpDepsPromise = null;
+      throw err;
+    });
+    return pvpDepsPromise;
   }
 
   // Never rewrite pvp/index.js → index.offline.js (mode is runtime-only).
@@ -208,6 +227,25 @@
       setTimeout(applyHomeAdventureToPvp, 800);
       setTimeout(applyHomeAdventureToPvp, 1600);
       setTimeout(applyHomeAdventureToPvp, 3000);
+      // After home is up, warm PvP bundle in idle time (does not compete with first load)
+      if (!onSceneReady._pvpWarm) {
+        onSceneReady._pvpWarm = true;
+        var warm = function () {
+          try {
+            if (window.fetch) {
+              fetch('assets/pvp/index.js', {
+                credentials: 'same-origin',
+                cache: 'force-cache',
+              }).catch(function () {});
+            }
+          } catch (e) {}
+        };
+        if (typeof requestIdleCallback === 'function') {
+          requestIdleCallback(warm, { timeout: 10000 });
+        } else {
+          setTimeout(warm, 6000);
+        }
+      }
     }
 
     function hookDirector() {
@@ -271,29 +309,35 @@
       '(index.js, no file swap)'
     );
 
-    var existing = null;
-    try {
-      existing = cc.assetManager.getBundle('pvp');
-    } catch (e) {}
+    ensurePvpDeps()
+      .then(function () {
+        var existing = null;
+        try {
+          existing = cc.assetManager.getBundle('pvp');
+        } catch (e) {}
 
-    if (existing && pvpBundleReady) {
-      // Reuse loaded bundle — just re-enter scene with new flags
-      runPvpScene(existing);
-      return;
-    }
+        if (existing && pvpBundleReady) {
+          // Reuse loaded bundle — just re-enter scene with new flags
+          runPvpScene(existing);
+          return;
+        }
 
-    try {
-      if (existing) cc.assetManager.removeBundle(existing);
-    } catch (e) {}
+        try {
+          if (existing) cc.assetManager.removeBundle(existing);
+        } catch (e) {}
 
-    cc.assetManager.loadBundle('pvp', function (err, bundle) {
-      if (err) {
-        console.error('[web-pvp] loadBundle failed', err);
-        return;
-      }
-      pvpBundleReady = true;
-      runPvpScene(bundle);
-    });
+        cc.assetManager.loadBundle('pvp', function (err, bundle) {
+          if (err) {
+            console.error('[web-pvp] loadBundle failed', err);
+            return;
+          }
+          pvpBundleReady = true;
+          runPvpScene(bundle);
+        });
+      })
+      .catch(function (err) {
+        console.error('[web-pvp] deps failed', err);
+      });
   }
 
   window.__enterPvp = enterPvp;
@@ -315,16 +359,12 @@
   window.__PVP_FORCE_OFFLINE = FORCE_OFFLINE;
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      prefetchBothIndexes();
-      startHomeBtnSwapWatcher();
-    });
+    document.addEventListener('DOMContentLoaded', startHomeBtnSwapWatcher);
   } else {
-    prefetchBothIndexes();
     startHomeBtnSwapWatcher();
   }
 
   console.log(
-    '[web-pvp] enabled — single index.js; Online/Bot via flags (prefetch both files)'
+    '[web-pvp] enabled — single index.js; Online/Bot via flags (lazy deps, no boot prefetch)'
   );
 })();
