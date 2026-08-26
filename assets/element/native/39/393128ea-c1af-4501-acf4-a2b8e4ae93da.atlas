@@ -1,0 +1,27 @@
+
+gameplay_spine_planeboom.png
+size: 236,141
+format: RGBA8888
+filter: MipMap,MipMap
+repeat: none
+FJ-11
+  rotate: false
+  xy: 4, 10
+  size: 127, 127
+  orig: 144, 143
+  offset: 8, 8
+  index: -1
+FJ-12
+  rotate: false
+  xy: 135, 4
+  size: 32, 32
+  orig: 34, 34
+  offset: 1, 1
+  index: -1
+FJ-2
+  rotate: false
+  xy: 135, 40
+  size: 97, 97
+  orig: 99, 99
+  offset: 1, 1
+  index: -1

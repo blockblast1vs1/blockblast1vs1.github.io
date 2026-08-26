@@ -1,0 +1,48 @@
+
+gameplay_spine_glass.png
+size: 280,162
+format: RGBA8888
+filter: MipMap,MipMap
+repeat: none
+MSP_26
+  rotate: false
+  xy: 112, 24
+  size: 106, 54
+  orig: 106, 54
+  offset: 0, 0
+  index: -1
+MSP_27
+  rotate: true
+  xy: 222, 4
+  size: 106, 54
+  orig: 106, 54
+  offset: 0, 0
+  index: -1
+MSP_28
+  rotate: false
+  xy: 210, 114
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+MSP_30
+  rotate: false
+  xy: 113, 82
+  size: 93, 76
+  orig: 137, 91
+  offset: 38, 8
+  index: -1
+MSP_3c
+  rotate: false
+  xy: 4, 83
+  size: 105, 75
+  orig: 106, 106
+  offset: 1, 2
+  index: -1
+MSP_3d
+  rotate: false
+  xy: 4, 4
+  size: 104, 75
+  orig: 104, 75
+  offset: 0, 0
+  index: -1

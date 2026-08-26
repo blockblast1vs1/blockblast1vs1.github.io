@@ -1,0 +1,370 @@
+
+gameplay_spine_bubbleWrap.png
+size: 883,889
+format: RGBA8888
+filter: MipMap,MipMap
+repeat: none
+MSP_23
+  rotate: false
+  xy: 766, 386
+  size: 59, 59
+  orig: 59, 59
+  offset: 0, 0
+  index: -1
+MSP_26
+  rotate: false
+  xy: 436, 779
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26a
+  rotate: false
+  xy: 436, 669
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26b
+  rotate: false
+  xy: 436, 559
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26d
+  rotate: false
+  xy: 436, 449
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26e
+  rotate: false
+  xy: 436, 339
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26g
+  rotate: false
+  xy: 436, 229
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_26h
+  rotate: false
+  xy: 766, 449
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27
+  rotate: false
+  xy: 436, 119
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27a
+  rotate: false
+  xy: 436, 9
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27b
+  rotate: false
+  xy: 546, 779
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27d
+  rotate: false
+  xy: 546, 669
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27e
+  rotate: false
+  xy: 546, 559
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27g
+  rotate: false
+  xy: 546, 449
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_27h
+  rotate: false
+  xy: 546, 339
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28
+  rotate: false
+  xy: 546, 229
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28a
+  rotate: false
+  xy: 546, 119
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28b
+  rotate: false
+  xy: 546, 9
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28d
+  rotate: false
+  xy: 656, 779
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28e
+  rotate: false
+  xy: 656, 669
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28g
+  rotate: false
+  xy: 656, 559
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_28h
+  rotate: false
+  xy: 656, 449
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29
+  rotate: false
+  xy: 656, 339
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29a
+  rotate: false
+  xy: 656, 229
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29b
+  rotate: false
+  xy: 656, 119
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29d
+  rotate: false
+  xy: 656, 9
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29e
+  rotate: false
+  xy: 766, 779
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29g
+  rotate: false
+  xy: 766, 669
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_29h
+  rotate: false
+  xy: 766, 559
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+MSP_3
+  rotate: false
+  xy: 766, 328
+  size: 52, 54
+  orig: 52, 54
+  offset: 0, 0
+  index: -1
+qipao/Gems1004_1_3
+  rotate: false
+  xy: 766, 328
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+MSP_4
+  rotate: false
+  xy: 4, 673
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_1
+  rotate: false
+  xy: 4, 457
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_2
+  rotate: false
+  xy: 4, 241
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_3
+  rotate: false
+  xy: 4, 25
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_4
+  rotate: false
+  xy: 220, 673
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_5
+  rotate: false
+  xy: 220, 457
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_6
+  rotate: false
+  xy: 220, 241
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+diban/Gems1004_2_7
+  rotate: false
+  xy: 220, 25
+  size: 212, 212
+  orig: 212, 212
+  offset: 0, 0
+  index: -1
+dig/dg_1
+  rotate: false
+  xy: 829, 395
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_2
+  rotate: false
+  xy: 822, 274
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_3
+  rotate: false
+  xy: 822, 220
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_4
+  rotate: false
+  xy: 822, 166
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_5
+  rotate: false
+  xy: 822, 112
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_6
+  rotate: false
+  xy: 824, 58
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+dig/dg_7
+  rotate: false
+  xy: 824, 4
+  size: 50, 50
+  orig: 52, 52
+  offset: 1, 1
+  index: -1
+qipao/Gems1004_1_1
+  rotate: false
+  xy: 766, 270
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+qipao/Gems1004_1_2
+  rotate: false
+  xy: 766, 212
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+qipao/Gems1004_1_4
+  rotate: false
+  xy: 766, 154
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+qipao/Gems1004_1_5
+  rotate: false
+  xy: 766, 96
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+qipao/Gems1004_1_6
+  rotate: true
+  xy: 766, 40
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1
+qipao/Gems1004_1_7
+  rotate: false
+  xy: 822, 328
+  size: 52, 54
+  orig: 56, 56
+  offset: 2, 1
+  index: -1

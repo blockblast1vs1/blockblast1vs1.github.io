@@ -1,0 +1,34 @@
+
+gameplay_spine_compass.png
+size: 188,110
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+图集/kuai
+  rotate: false
+  xy: 2, 2
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+图集/znz
+  rotate: true
+  xy: 110, 46
+  size: 62, 34
+  orig: 106, 106
+  offset: 22, 34
+  index: -1
+图集/zt_blue
+  rotate: true
+  xy: 146, 65
+  size: 43, 40
+  orig: 46, 44
+  offset: 2, 2
+  index: -1
+图集/zt_red
+  rotate: false
+  xy: 110, 2
+  size: 44, 42
+  orig: 47, 46
+  offset: 1, 2
+  index: -1

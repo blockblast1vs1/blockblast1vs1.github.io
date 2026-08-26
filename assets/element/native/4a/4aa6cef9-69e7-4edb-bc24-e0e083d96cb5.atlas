@@ -1,0 +1,69 @@
+
+gameplay_spine_gophers_burrow.png
+size: 550,111
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+dishu1
+  rotate: true
+  xy: 301, 25
+  size: 84, 77
+  orig: 106, 106
+  offset: 11, 12
+  index: -1
+dishu2
+  rotate: true
+  xy: 218, 17
+  size: 92, 81
+  orig: 106, 106
+  offset: 7, 10
+  index: -1
+dishu3
+  rotate: true
+  xy: 380, 25
+  size: 84, 77
+  orig: 106, 106
+  offset: 11, 12
+  index: -1
+dsd_w
+  rotate: false
+  xy: 2, 3
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+dsd_y
+  rotate: false
+  xy: 110, 3
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+shitou1
+  rotate: false
+  xy: 459, 2
+  size: 46, 49
+  orig: 46, 49
+  offset: 0, 0
+  index: -1
+shitou2
+  rotate: false
+  xy: 510, 74
+  size: 28, 35
+  orig: 28, 36
+  offset: 0, 0
+  index: -1
+shitou3
+  rotate: false
+  xy: 507, 2
+  size: 41, 49
+  orig: 41, 49
+  offset: 0, 0
+  index: -1
+shitou4
+  rotate: true
+  xy: 459, 53
+  size: 56, 49
+  orig: 56, 49
+  offset: 0, 0
+  index: -1
