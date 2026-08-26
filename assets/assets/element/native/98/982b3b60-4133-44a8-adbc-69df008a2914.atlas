@@ -1,0 +1,76 @@
+
+gameplay_spine_tortoise.png
+size: 283,142
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+wg/wugui_ke
+  rotate: false
+  xy: 201, 56
+  size: 80, 84
+  orig: 80, 84
+  offset: 0, 0
+  index: -1
+wg/wugui_t
+  rotate: true
+  xy: 108, 2
+  size: 34, 38
+  orig: 34, 38
+  offset: 0, 0
+  index: -1
+wg/wugui_wb
+  rotate: false
+  xy: 93, 21
+  size: 13, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+wg/wugui_yq
+  rotate: false
+  xy: 35, 5
+  size: 27, 27
+  orig: 27, 27
+  offset: 0, 0
+  index: -1
+wg/wugui_yx
+  rotate: true
+  xy: 2, 6
+  size: 26, 31
+  orig: 27, 31
+  offset: 1, 0
+  index: -1
+wg/wugui_zq
+  rotate: false
+  xy: 64, 5
+  size: 27, 27
+  orig: 27, 27
+  offset: 0, 0
+  index: -1
+wg/wugui_zx
+  rotate: false
+  xy: 148, 5
+  size: 26, 31
+  orig: 27, 31
+  offset: 0, 0
+  index: -1
+wuguidan1
+  rotate: true
+  xy: 201, 2
+  size: 52, 59
+  orig: 52, 59
+  offset: 0, 0
+  index: -1
+wuguidan2
+  rotate: false
+  xy: 108, 38
+  size: 91, 102
+  orig: 91, 102
+  offset: 0, 0
+  index: -1
+wuguiwo
+  rotate: false
+  xy: 2, 34
+  size: 104, 106
+  orig: 106, 106
+  offset: 1, 0
+  index: -1

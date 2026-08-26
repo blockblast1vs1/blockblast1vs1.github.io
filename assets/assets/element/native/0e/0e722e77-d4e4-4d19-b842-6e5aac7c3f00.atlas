@@ -1,0 +1,41 @@
+
+gameplay_spine_dandelion.png
+size: 280,110
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+pgy_1
+  rotate: false
+  xy: 110, 4
+  size: 104, 104
+  orig: 104, 104
+  offset: 0, 0
+  index: -1
+pgy_2
+  rotate: false
+  xy: 216, 44
+  size: 62, 64
+  orig: 62, 64
+  offset: 0, 0
+  index: -1
+pgy_3
+  rotate: false
+  xy: 2, 2
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+pgy_4
+  rotate: false
+  xy: 216, 26
+  size: 7, 16
+  orig: 7, 16
+  offset: 0, 0
+  index: -1
+pgy_6
+  rotate: false
+  xy: 225, 31
+  size: 11, 11
+  orig: 15, 15
+  offset: 2, 2
+  index: -1

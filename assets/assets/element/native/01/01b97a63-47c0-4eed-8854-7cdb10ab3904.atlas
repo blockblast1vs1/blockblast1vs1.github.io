@@ -1,0 +1,41 @@
+
+gameplay_spine_door.png
+size: 394,110
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+KK_1
+  rotate: false
+  xy: 2, 2
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+KK_2
+  rotate: false
+  xy: 218, 6
+  size: 102, 102
+  orig: 102, 102
+  offset: 0, 0
+  index: -1
+kaiHeMen_BS
+  rotate: false
+  xy: 375, 83
+  size: 17, 25
+  orig: 17, 25
+  offset: 0, 0
+  index: -1
+kaiHeMen_M
+  rotate: false
+  xy: 322, 6
+  size: 51, 102
+  orig: 51, 102
+  offset: 0, 0
+  index: -1
+kaiHeMen_on
+  rotate: false
+  xy: 110, 2
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1

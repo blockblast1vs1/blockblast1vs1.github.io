@@ -1,0 +1,13 @@
+
+gameplay_spine_magnetLightning.png
+size: 854,54
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+shanDian
+  rotate: false
+  xy: 2, 2
+  size: 850, 50
+  orig: 850, 50
+  offset: 0, 0
+  index: -1

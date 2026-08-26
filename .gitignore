@@ -1,0 +1,9 @@
+# Decrypted output/files
+decrypt/
+
+# Tooling scripts or binaries
+tools/
+
+# Log files
+*.log
+.log

@@ -1,0 +1,62 @@
+
+gameplay_spine_eliminate3.png
+size: 852,218
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+00基础方块/红
+  rotate: false
+  xy: 269, 110
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+00基础方块/蓝
+  rotate: false
+  xy: 161, 110
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+00基础方块/黄
+  rotate: false
+  xy: 377, 110
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+FX/Gradient
+  rotate: false
+  xy: 59, 116
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+FX/Light
+  rotate: false
+  xy: 2, 2
+  size: 848, 106
+  orig: 848, 106
+  offset: 0, 0
+  index: -1
+FX/中
+  rotate: false
+  xy: 12, 201
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+FX/大
+  rotate: false
+  xy: 29, 188
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1
+FX/小
+  rotate: false
+  xy: 2, 208
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1

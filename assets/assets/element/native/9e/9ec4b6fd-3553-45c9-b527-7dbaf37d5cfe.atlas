@@ -1,0 +1,34 @@
+
+JSBS.png
+size: 640,640
+format: RGBA8888
+filter: MipMap,MipMap
+repeat: none
+jsbs_1
+  rotate: false
+  xy: 233, 4
+  size: 155, 121
+  orig: 155, 121
+  offset: 0, 0
+  index: -1
+jsbs_3
+  rotate: false
+  xy: 31, 46
+  size: 96, 79
+  orig: 98, 81
+  offset: 1, 1
+  index: -1
+jsbs_4
+  rotate: false
+  xy: 4, 102
+  size: 23, 23
+  orig: 25, 25
+  offset: 1, 1
+  index: -1
+mb_11
+  rotate: false
+  xy: 131, 27
+  size: 98, 98
+  orig: 108, 108
+  offset: 5, 5
+  index: -1
