@@ -1,8 +1,12 @@
 # Decrypted output/files
 decrypt/
 
-# Tooling scripts or binaries
-tools/
+# Tooling scripts or binaries (keep local gzip server)
+tools/*
+!tools/serve.js
+
+# Dependencies
+node_modules/
 
 # Log files
 *.log

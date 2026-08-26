@@ -1,0 +1,13 @@
+{
+  "name": "blockblast-web",
+  "private": true,
+  "scripts": {
+    "start": "node tools/serve.js",
+    "start:plain": "http-server . -p 8080 -c-1 --cors"
+  },
+  "devDependencies": {
+    "compression": "^1.8.1",
+    "express": "^4.21.2",
+    "http-server": "^14.1.1"
+  }
+}
