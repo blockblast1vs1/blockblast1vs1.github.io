@@ -263,7 +263,8 @@ window.boot = function () {
 
     var jsList = settings.jsList || [];
     if (jsList.length) {
-        cc.assetManager.loadScript(jsList.map(function (x) { return 'src/' + x; }), cb);
+        var ver = (typeof window !== 'undefined' && window.__ASSET_VER) ? ('?v=' + window.__ASSET_VER) : '';
+        cc.assetManager.loadScript(jsList.map(function (x) { return 'src/' + x + ver; }), cb);
     } else {
         cb();
     }

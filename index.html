@@ -1,35 +1,43 @@
 <!doctype html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
 
-  <title>Block Blast 1vs1</title>
-  <!-- Start biggest downloads ASAP (compete less with PvP / fonts) -->
-  <link rel="preload" href="src/cocos2d-js-min.js" as="script" />
-  <link rel="preload" href="assets/main/index.js" as="script" />
-  <link rel="preload" href="assets/main/config.json" as="fetch" crossorigin />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-  />
-  <noscript>
+    <title>Block Blast 1vs1</title>
+    <script>
+      // Bump when shipping src/*.js or style-mobile.css so CDN/browser cache refreshes
+      window.__ASSET_VER = "20260826.2";
+    </script>
+    <!-- Start biggest downloads ASAP (compete less with PvP / fonts) -->
+    <link
+      rel="preload"
+      href="src/cocos2d-js-min.js?v=20260826.2"
+      as="script"
+    />
+    <link rel="preload" href="assets/main/index.js" as="script" />
+    <link rel="preload" href="assets/main/config.json" as="fetch" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
     />
-  </noscript>
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
-  <!--http://www.html5rocks.com/en/mobile/mobifying/-->
+    <!--http://www.html5rocks.com/en/mobile/mobifying/-->
     <meta
       name="viewport"
       content="width=device-width,user-scalable=no,initial-scale=1, minimum-scale=1,maximum-scale=1"
     />
 
-  <!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
+    <!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
@@ -37,42 +45,46 @@
     />
     <meta name="format-detection" content="telephone=no" />
 
-  <!-- force webkit on 360 -->
+    <!-- force webkit on 360 -->
     <meta name="renderer" content="webkit" />
     <meta name="force-rendering" content="webkit" />
-  <!-- force edge on IE -->
+    <!-- force edge on IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="msapplication-tap-highlight" content="no" />
 
-  <!-- force full screen on some browser -->
+    <!-- force full screen on some browser -->
     <meta name="full-screen" content="yes" />
     <meta name="x5-fullscreen" content="true" />
     <meta name="360-fullscreen" content="true" />
-  
-  <!-- force screen orientation on some browser -->
+
+    <!-- force screen orientation on some browser -->
     <meta name="screen-orientation" content="portrait" />
     <meta name="x5-orientation" content="portrait" />
 
-  <!--fix fireball/issues/3568 -->
-  <!--<meta name="browsermode" content="application">-->
+    <!--fix fireball/issues/3568 -->
+    <!--<meta name="browsermode" content="application">-->
     <meta name="x5-page-mode" content="app" />
 
-  <!--<link rel="apple-touch-icon" href=".png" />-->
-  <!--<link rel="apple-touch-icon-precomposed" href=".png" />-->
+    <!--<link rel="apple-touch-icon" href=".png" />-->
+    <!--<link rel="apple-touch-icon-precomposed" href=".png" />-->
 
-  <script src="src/web-adapter.js" charset="utf-8"></script>
-  <script src="src/web-api-mock.js" charset="utf-8"></script>
-  <script src="src/web-pvp-offline.js" charset="utf-8"></script>
-  <script src="src/web-pvp-room-ui.js" charset="utf-8"></script>
-  <script src="src/web-bundle-adapter.js" charset="utf-8"></script>
-  <script src="src/native-image-decrypt.js" charset="utf-8"></script>
-  <script src="src/json-bundle-loader.js" charset="utf-8"></script>
-  <script src="src/image-bundle-loader.js" charset="utf-8"></script>
-  <!-- <script src="src/web-skin-helper.js" charset="utf-8"></script> -->
+    <script src="src/web-adapter.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/web-api-mock.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/web-pvp-offline.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/web-pvp-room-ui.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/web-bundle-adapter.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/native-image-decrypt.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/json-bundle-loader.js?v=20260826.2" charset="utf-8"></script>
+    <script src="src/image-bundle-loader.js?v=20260826.2" charset="utf-8"></script>
+    <!-- <script src="src/web-skin-helper.js?v=20260826.2" charset="utf-8"></script> -->
 
-    <link rel="stylesheet" type="text/css" href="src/style-mobile.css" />
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="src/style-mobile.css?v=20260826.2"
+    />
+  </head>
+  <body>
     <div id="splash" aria-hidden="true">
       <div class="splash-bg"></div>
       <div class="splash-grid"></div>
@@ -102,21 +114,21 @@
       tabindex="0"
     ></canvas>
 
-<script src="src/settings.js" charset="utf-8"></script>
+    <script src="src/settings.js?v=20260826.2" charset="utf-8"></script>
 
-    <script src="src/main.stable.js" charset="utf-8"></script>
+    <script src="src/main.stable.js?v=20260826.2" charset="utf-8"></script>
 
-<script type="text/javascript">
-(function () {
-    // open web debugger console
+    <script type="text/javascript">
+      (function () {
+        // open web debugger console
         if (typeof VConsole !== "undefined") {
-        window.vConsole = new VConsole();
-    }
+          window.vConsole = new VConsole();
+        }
 
-    var debug = window._CCSettings.debug;
+        var debug = window._CCSettings.debug;
 
-    var temparr = [
-      {
+        var temparr = [
+          {
             suffix: [
               "d801c7a0-1b20-4280-b9f0-5b940335c960.json",
               "05988370-3af5-4f2c-b67f-445e19234e2b.json",
@@ -1262,40 +1274,45 @@
           ],
         ];
         window.jsonreqs = {};
-    for (var arr of temparr) {
-      for (var suffix of arr["suffix"]) {
-        window.jsonreqs[suffix] = arr["text"];
-      }
-    }
-    for (var arr2 of temparr2) {
+        for (var arr of temparr) {
+          for (var suffix of arr["suffix"]) {
+            window.jsonreqs[suffix] = arr["text"];
+          }
+        }
+        for (var arr2 of temparr2) {
           window.jsonreqs[arr2[0]] =
             `[1,["05mINwOvVPLLZ/RF4ZI04r"],["_textureSetter"],["cc.SpriteFrame"],0,[{"name":"${arr2[1]}","rect":[${arr2[2]},38,38],"offset":[0,0],"originalSize":[38,38],"capInsets":[0,0,0,0]}],[0],0,[0],[0],[0]]`;
-    }
+        }
 
-    for (var arr3 of temparr3) {
+        for (var arr3 of temparr3) {
           var temp = arr3[2].split(",");
           var temp2 = temp[2] + "," + temp[3];
           window.jsonreqs[arr3[0]] =
             `[1,["ed1Kof/V9IFbGdm9Ys2iKP"],["_textureSetter"],["cc.SpriteFrame"],0,[{"name":"${arr3[1]}","rect":[${arr3[2]}],"offset":[0,0],"originalSize":[${temp2}],"capInsets":[0,0,0,0]}],[0],0,[0],[0],[0]]`;
-    }
+        }
 
-    for (var arr4 of temparr4) {
+        for (var arr4 of temparr4) {
           window.jsonreqs[arr4[0]] =
             `[1,["${arr4[1]}"],["_textureSetter"],["cc.SpriteFrame"],0,${arr4[2]},[0],0,[0],[0],[0]]`;
-    }
+        }
 
         function loadScript(moduleName, cb) {
           function scriptLoaded() {
-          document.body.removeChild(domScript);
+            document.body.removeChild(domScript);
             domScript.removeEventListener("load", scriptLoaded, false);
-          cb && cb();
+            cb && cb();
+          }
+          var ver = window.__ASSET_VER || "";
+          var url = moduleName;
+          if (ver && url.indexOf("?") === -1) {
+            url += "?v=" + ver;
           }
           var domScript = document.createElement("script");
-      domScript.async = true;
-      domScript.src = moduleName;
+          domScript.async = true;
+          domScript.src = url;
           domScript.addEventListener("load", scriptLoaded, false);
-      document.body.appendChild(domScript);
-    }
+          document.body.appendChild(domScript);
+        }
 
         loadScript(
           debug ? "src/cocos2d-js.js" : "src/cocos2d-js-min.js",
@@ -1310,11 +1327,11 @@
                 window.boot,
               );
             } else {
-        window.boot();
-      }
+              window.boot();
+            }
           },
         );
-})();
-</script>
-</body>
+      })();
+    </script>
+  </body>
 </html>

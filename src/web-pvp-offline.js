@@ -6,7 +6,7 @@
  * - No boot-time prefetch (keeps first load fast); deps load on enterPvp
  */
 (function () {
-  'use strict';
+  "use strict";
 
   // Runtime mode: false = Online (PeerJS), true = Bot (OfflineClient)
   var FORCE_OFFLINE = false;
@@ -14,20 +14,20 @@
   var pvpDepsPromise = null;
 
   try {
-    localStorage.setItem('open_pvp', '1');
-    localStorage.setItem('SCORE_FOR_PVP', '1');
+    localStorage.setItem("open_pvp", "1");
+    localStorage.setItem("SCORE_FOR_PVP", "1");
     // Never leave a stale bot flag from a previous session
-    localStorage.removeItem('pvp_play_bot');
-    localStorage.setItem('pvp_force_offline', '0');
+    localStorage.removeItem("pvp_play_bot");
+    localStorage.setItem("pvp_force_offline", "0");
   } catch (e) {}
 
   var PVP_WS_RE = /pvp-global\.blockblast\.com|:22601/i;
 
   var PVP_DEPS = [
-    'src/assets/games/pvp/proto/protobuf.min.js',
-    'src/assets/games/pvp/proto/protobufpvp.js',
-    'src/assets/games/pvp/proto/peerjs.min.js',
-    'src/assets/scripts/func/LoginSever/axios.min.js',
+    "src/assets/games/pvp/proto/protobuf.min.js",
+    "src/assets/games/pvp/proto/protobufpvp.js",
+    "src/assets/games/pvp/proto/peerjs.min.js",
+    "src/assets/scripts/func/LoginSever/axios.min.js",
   ];
 
   function isBotMode() {
@@ -35,31 +35,36 @@
   }
 
   function setPvpMode(mode) {
-    var bot = mode === 'bot' || mode === 'offline' || mode === true;
+    var bot = mode === "bot" || mode === "offline" || mode === true;
     FORCE_OFFLINE = !!bot;
     window.__PVP_FORCE_OFFLINE = FORCE_OFFLINE;
     try {
-      localStorage.setItem('pvp_force_offline', FORCE_OFFLINE ? '1' : '0');
-      if (FORCE_OFFLINE) localStorage.setItem('pvp_play_bot', '1');
-      else localStorage.removeItem('pvp_play_bot');
+      localStorage.setItem("pvp_force_offline", FORCE_OFFLINE ? "1" : "0");
+      if (FORCE_OFFLINE) localStorage.setItem("pvp_play_bot", "1");
+      else localStorage.removeItem("pvp_play_bot");
     } catch (e) {}
     console.log(
-      '[web-pvp] mode →',
-      FORCE_OFFLINE ? 'bot (offline client)' : 'online (PeerJS / index.js)'
+      "[web-pvp] mode →",
+      FORCE_OFFLINE ? "bot (offline client)" : "online (PeerJS / index.js)",
     );
   }
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
+      var ver = window.__ASSET_VER || "";
+      var url = src;
+      if (ver && url.indexOf("?") === -1) {
+        url += "?v=" + ver;
+      }
+      var s = document.createElement("script");
       s.async = true;
-      s.charset = 'utf-8';
-      s.src = src;
+      s.charset = "utf-8";
+      s.src = url;
       s.onload = function () {
         resolve();
       };
       s.onerror = function () {
-        reject(new Error('Failed to load ' + src));
+        reject(new Error("Failed to load " + src));
       };
       document.head.appendChild(s);
     });
@@ -83,20 +88,20 @@
   // Still block dead online WS host when in bot mode.
   (function installWsGuard() {
     var NativeWS = window.WebSocket;
-    if (typeof NativeWS !== 'function') return;
+    if (typeof NativeWS !== "function") return;
 
     function BlockedPvpWebSocket(url) {
       var self = this;
-      this.url = String(url || '');
+      this.url = String(url || "");
       this.readyState = NativeWS.CONNECTING;
       this.bufferedAmount = 0;
-      this.extensions = '';
-      this.protocol = '';
-      this.binaryType = 'blob';
+      this.extensions = "";
+      this.protocol = "";
+      this.binaryType = "blob";
       setTimeout(function () {
         self.readyState = NativeWS.CLOSED;
-        var err = new Event('error');
-        if (typeof self.onerror === 'function') {
+        var err = new Event("error");
+        if (typeof self.onerror === "function") {
           try {
             self.onerror(err);
           } catch (e1) {}
@@ -105,14 +110,14 @@
           self.dispatchEvent(err);
         } catch (e2) {}
         var closeEvt =
-          typeof CloseEvent === 'function'
-            ? new CloseEvent('close', {
+          typeof CloseEvent === "function"
+            ? new CloseEvent("close", {
                 code: 1006,
-                reason: 'web-pvp-bot-mode',
+                reason: "web-pvp-bot-mode",
                 wasClean: false,
               })
-            : new Event('close');
-        if (typeof self.onclose === 'function') {
+            : new Event("close");
+        if (typeof self.onclose === "function") {
           try {
             self.onclose(closeEvt);
           } catch (e3) {}
@@ -133,8 +138,8 @@
     };
 
     window.WebSocket = function (url, protocols) {
-      if (FORCE_OFFLINE && PVP_WS_RE.test(String(url || ''))) {
-        console.warn('[web-pvp] blocked online WS (bot mode):', url);
+      if (FORCE_OFFLINE && PVP_WS_RE.test(String(url || ""))) {
+        console.warn("[web-pvp] blocked online WS (bot mode):", url);
         return new BlockedPvpWebSocket(url);
       }
       return protocols !== undefined
@@ -153,11 +158,7 @@
    */
   function findHomeBtnNode() {
     if (!window.cc || !cc.find) return null;
-    return (
-      cc.find('Canvas/btn/btnNode') ||
-      cc.find('btn/btnNode') ||
-      null
-    );
+    return cc.find("Canvas/btn/btnNode") || cc.find("btn/btnNode") || null;
   }
 
   function openPvpModePicker() {
@@ -165,18 +166,18 @@
     openPvpModePicker._busy = true;
     var ui = window.__pvpRoomUI;
     var p =
-      ui && typeof ui.chooseMode === 'function'
+      ui && typeof ui.chooseMode === "function"
         ? ui.chooseMode()
-        : Promise.resolve({ mode: 'online' });
+        : Promise.resolve({ mode: "online" });
     Promise.resolve(p)
       .then(function (choice) {
         openPvpModePicker._busy = false;
         if (!choice || choice.cancelled) return;
-        enterPvp(choice.mode === 'bot' ? 'bot' : 'online');
+        enterPvp(choice.mode === "bot" ? "bot" : "online");
       })
       .catch(function (err) {
         openPvpModePicker._busy = false;
-        console.warn('[web-pvp] mode picker failed', err);
+        console.warn("[web-pvp] mode picker failed", err);
       });
   }
 
@@ -188,7 +189,7 @@
     }
     if (pvp.__pvpModePicker) return;
     pvp.__pvpModePicker = true;
-    pvp.on('click', function () {
+    pvp.on("click", function () {
       openPvpModePicker();
     });
   }
@@ -197,8 +198,8 @@
     var btnNode = findHomeBtnNode();
     if (!btnNode || !cc.isValid(btnNode)) return false;
 
-    var journey = btnNode.getChildByName('btn_JourneyLoading');
-    var pvp = btnNode.getChildByName('btn_PVP');
+    var journey = btnNode.getChildByName("btn_JourneyLoading");
+    var pvp = btnNode.getChildByName("btn_PVP");
     if (!pvp || !cc.isValid(pvp)) return false;
 
     if (journey && cc.isValid(journey)) {
@@ -233,14 +234,14 @@
         var warm = function () {
           try {
             if (window.fetch) {
-              fetch('assets/pvp/index.js', {
-                credentials: 'same-origin',
-                cache: 'force-cache',
+              fetch("assets/pvp/index.js", {
+                credentials: "same-origin",
+                cache: "force-cache",
               }).catch(function () {});
             }
           } catch (e) {}
         };
-        if (typeof requestIdleCallback === 'function') {
+        if (typeof requestIdleCallback === "function") {
           requestIdleCallback(warm, { timeout: 10000 });
         } else {
           setTimeout(warm, 6000);
@@ -269,19 +270,19 @@
       if (findHomeBtnNode()) applyHomeAdventureToPvp();
     }, 1000);
 
-    console.log('[web-pvp] Home: Adventure → PvP + Online/Bot picker');
+    console.log("[web-pvp] Home: Adventure → PvP + Online/Bot picker");
   }
 
   function runPvpScene(bundle) {
-    bundle.loadScene('scene/pvp', function (e2, scene) {
+    bundle.loadScene("scene/pvp", function (e2, scene) {
       if (e2) {
-        console.error('[web-pvp] loadScene failed', e2);
+        console.error("[web-pvp] loadScene failed", e2);
         return;
       }
       cc.director.runScene(scene);
       console.log(
-        '[web-pvp] entered scene/pvp as',
-        FORCE_OFFLINE ? 'bot' : 'online'
+        "[web-pvp] entered scene/pvp as",
+        FORCE_OFFLINE ? "bot" : "online",
       );
       try {
         window.__pvpSwitchingToBot = false;
@@ -291,12 +292,13 @@
 
   function enterPvp(mode) {
     if (!window.cc || !cc.assetManager) {
-      console.error('[web-pvp] cc not ready');
+      console.error("[web-pvp] cc not ready");
       return;
     }
 
-    if (mode === 'bot' || mode === 'offline' || mode === true) setPvpMode('bot');
-    else setPvpMode('online');
+    if (mode === "bot" || mode === "offline" || mode === true)
+      setPvpMode("bot");
+    else setPvpMode("online");
 
     try {
       window.__pvpSwitchingToBot = FORCE_OFFLINE;
@@ -304,16 +306,16 @@
 
     // Always the same bundle script (index.js). Mode = flags only.
     console.log(
-      '[web-pvp] loading pvp bundle… mode=',
-      FORCE_OFFLINE ? 'bot' : 'online',
-      '(index.js, no file swap)'
+      "[web-pvp] loading pvp bundle… mode=",
+      FORCE_OFFLINE ? "bot" : "online",
+      "(index.js, no file swap)",
     );
 
     ensurePvpDeps()
       .then(function () {
         var existing = null;
         try {
-          existing = cc.assetManager.getBundle('pvp');
+          existing = cc.assetManager.getBundle("pvp");
         } catch (e) {}
 
         if (existing && pvpBundleReady) {
@@ -326,9 +328,9 @@
           if (existing) cc.assetManager.removeBundle(existing);
         } catch (e) {}
 
-        cc.assetManager.loadBundle('pvp', function (err, bundle) {
+        cc.assetManager.loadBundle("pvp", function (err, bundle) {
           if (err) {
-            console.error('[web-pvp] loadBundle failed', err);
+            console.error("[web-pvp] loadBundle failed", err);
             return;
           }
           pvpBundleReady = true;
@@ -336,7 +338,7 @@
         });
       })
       .catch(function (err) {
-        console.error('[web-pvp] deps failed', err);
+        console.error("[web-pvp] deps failed", err);
       });
   }
 
@@ -347,24 +349,24 @@
     try {
       window.__pvpSwitchingToBot = true;
     } catch (e) {}
-    enterPvp('bot');
+    enterPvp("bot");
   };
   window.__pvpClearPlayBot = function () {
     try {
-      localStorage.removeItem('pvp_play_bot');
+      localStorage.removeItem("pvp_play_bot");
     } catch (e) {}
-    setPvpMode('online');
+    setPvpMode("online");
   };
 
   window.__PVP_FORCE_OFFLINE = FORCE_OFFLINE;
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startHomeBtnSwapWatcher);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startHomeBtnSwapWatcher);
   } else {
     startHomeBtnSwapWatcher();
   }
 
   console.log(
-    '[web-pvp] enabled — single index.js; Online/Bot via flags (lazy deps, no boot prefetch)'
+    "[web-pvp] enabled — single index.js; Online/Bot via flags (lazy deps, no boot prefetch)",
   );
 })();
