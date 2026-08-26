@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
 
   <title>Block Blast 1vs1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
 
   <!--http://www.html5rocks.com/en/mobile/mobifying/-->
     <meta
@@ -55,6 +61,29 @@
     <link rel="stylesheet" type="text/css" href="src/style-mobile.css" />
 </head>
 <body>
+    <div id="splash" aria-hidden="true">
+      <div class="splash-bg"></div>
+      <div class="splash-grid"></div>
+      <div class="splash-core">
+        <div class="splash-blocks" aria-hidden="true">
+          <span class="b b1"></span>
+          <span class="b b2"></span>
+          <span class="b b3"></span>
+          <span class="b b4"></span>
+          <span class="b b5"></span>
+          <span class="b b6"></span>
+          <span class="b b7"></span>
+          <span class="b b8"></span>
+          <span class="b b9"></span>
+        </div>
+        <div class="splash-brand">Block Blast</div>
+        <div class="splash-tag">1 vs 1</div>
+        <div class="splash-load">
+          <div class="splash-ring"></div>
+          <span>Loading</span>
+        </div>
+      </div>
+    </div>
     <canvas
       id="GameCanvas"
       oncontextmenu="event.preventDefault()"

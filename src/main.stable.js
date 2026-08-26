@@ -163,8 +163,7 @@ window.boot = function () {
     }
 
     function setLoadingDisplay () {
-        // Skip splash UI on web — show canvas as soon as scene launches
-        hideSplash();
+        // Keep HTML splash until first scene launches (avoids black WebGL flash)
         onProgress = null;
         cc.director.once(cc.Director.EVENT_AFTER_SCENE_LAUNCH, showGameCanvas);
     }
