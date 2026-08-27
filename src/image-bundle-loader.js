@@ -298,6 +298,7 @@
         return deliverImage(original, downloaderRef, url, options, callback);
       }
 
+      // Bundle ready: serve from pack
       if (bundleLoaded && bundleArrayBuffer && bundleIndex) {
         const entry = getEntry(relativePath);
         if (entry) {
@@ -310,20 +311,9 @@
         return deliverImage(original, downloaderRef, url, options, callback);
       }
 
-      loadBundle()
-        .then(() => {
-          const entry = getEntry(relativePath);
-          if (entry) {
-            stats.bundleHits++;
-            callback(null, makeBlobFromEntry(entry, relativePath));
-          } else {
-            stats.bundleMisses++;
-            deliverImage(original, downloaderRef, url, options, callback);
-          }
-        })
-        .catch(() => {
-          deliverImage(original, downloaderRef, url, options, callback);
-        });
+      // Lazy: do not block first paint on ~63MB R2 download — network passthrough
+      stats.bundleMisses++;
+      return deliverImage(original, downloaderRef, url, options, callback);
     };
   }
 
@@ -364,8 +354,45 @@
     return changed;
   }
 
+  /** After first scene (Home), warm R2 image bundle in idle time. */
+  function scheduleWarmAfterFirstScene() {
+    function warm() {
+      loadBundle()
+        .then(() => log.info("✓ Image bundle warmed after scene"))
+        .catch(() => {});
+    }
+
+    function onScene() {
+      if (scheduleWarmAfterFirstScene._done) return;
+      scheduleWarmAfterFirstScene._done = true;
+      if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(warm, { timeout: 8000 });
+      } else {
+        setTimeout(warm, 2500);
+      }
+    }
+
+    function hookDirector() {
+      if (!window.cc || !cc.director) return false;
+      try {
+        cc.director.once(cc.Director.EVENT_AFTER_SCENE_LAUNCH, onScene);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (!hookDirector()) {
+      const wait = setInterval(() => {
+        if (hookDirector()) clearInterval(wait);
+      }, 100);
+      setTimeout(() => clearInterval(wait), 60000);
+    }
+  }
+
   function hookCocosDownloader() {
-    loadBundle().catch(() => {});
+    // Option B: no boot-time loadBundle — wait until after first scene
+    scheduleWarmAfterFirstScene();
 
     const checkInterval = setInterval(() => {
       if (

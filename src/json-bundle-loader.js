@@ -155,10 +155,49 @@
     return null;
   }
 
+  /** After first scene (Home), warm R2 JSON bundle in idle time. */
+  function scheduleWarmAfterFirstScene() {
+    function warm() {
+      loadBundle()
+        .then(() => log.info("✓ JSON bundle warmed after scene"))
+        .catch(() => {});
+    }
+
+    function onScene() {
+      if (scheduleWarmAfterFirstScene._done) return;
+      scheduleWarmAfterFirstScene._done = true;
+      if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(warm, { timeout: 8000 });
+      } else {
+        setTimeout(warm, 2500);
+      }
+    }
+
+    function hookDirector() {
+      if (!window.cc || !cc.director) return false;
+      try {
+        cc.director.once(cc.Director.EVENT_AFTER_SCENE_LAUNCH, onScene);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (!hookDirector()) {
+      const wait = setInterval(() => {
+        if (hookDirector()) clearInterval(wait);
+      }, 100);
+      setTimeout(() => clearInterval(wait), 60000);
+    }
+  }
+
   /**
    * Hook Cocos Creator的Downloader
    */
   function hookCocosDownloader() {
+    // Option B: no boot-time loadBundle — wait until after first scene
+    scheduleWarmAfterFirstScene();
+
     const checkInterval = setInterval(() => {
       if (
         typeof cc !== "undefined" &&
@@ -189,9 +228,6 @@
 
     log.info("Installing JSON downloader hook...");
 
-    // 预加载bundle
-    loadBundle().catch(() => {});
-
     // 创建hook函数
     const hookedDownloader = function (url, options, callback) {
       stats.totalRequests++;
@@ -210,7 +246,7 @@
 
       log.info("Intercepted:", relativePath);
 
-      // 如果bundle已加载，直接查找
+      // Bundle ready: serve from pack
       if (bundleLoaded) {
         const cached = getFromCache(relativePath);
         if (cached !== null) {
@@ -221,29 +257,14 @@
           return;
         }
 
-        // bundle中没有，走原始下载
         stats.bundleMisses++;
         log.info("→ Not in bundle:", relativePath);
         return originalDownloadJson.call(downloader, url, options, callback);
       }
 
-      // bundle还在加载中，等待加载完成
-      loadBundle()
-        .then(() => {
-          const cached = getFromCache(relativePath);
-          if (cached !== null) {
-            stats.bundleHits++;
-            log.info("✓ Bundle hit:", relativePath);
-            callback(null, cloneJson(cached));
-          } else {
-            stats.bundleMisses++;
-            log.info("→ Not in bundle:", relativePath);
-            originalDownloadJson.call(downloader, url, options, callback);
-          }
-        })
-        .catch(() => {
-          originalDownloadJson.call(downloader, url, options, callback);
-        });
+      // Lazy: do not block first paint on large R2 download
+      stats.bundleMisses++;
+      return originalDownloadJson.call(downloader, url, options, callback);
     };
 
     // 安装hook
