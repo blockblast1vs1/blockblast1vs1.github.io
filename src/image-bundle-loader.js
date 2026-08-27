@@ -18,18 +18,20 @@
  */
 
 (function () {
-  'use strict';
+  "use strict";
 
   const CONFIG = {
-    bundleUrl: 'img-bundles/bundle.bin.gz',
+    bundleUrl:
+      "https://pub-884738475c4b45d5aa9108b09fd6e501.r2.dev/bundle.bin.gz",
     debug: false,
     recording: false,
   };
 
   const log = {
-    info: (...args) => CONFIG.debug && console.log('[ImageBundleLoader]', ...args),
-    warn: (...args) => console.warn('[ImageBundleLoader]', ...args),
-    error: (...args) => console.error('[ImageBundleLoader]', ...args),
+    info: (...args) =>
+      CONFIG.debug && console.log("[ImageBundleLoader]", ...args),
+    warn: (...args) => console.warn("[ImageBundleLoader]", ...args),
+    error: (...args) => console.error("[ImageBundleLoader]", ...args),
   };
 
   const stats = {
@@ -49,26 +51,28 @@
   const recordedPaths = new Set();
 
   function extractRelativePath(url) {
-    const cleanUrl = url.split('?')[0].split('#')[0];
+    const cleanUrl = url.split("?")[0].split("#")[0];
     // assets/{subpackage}/native/.../*.png|jpg|jpeg|webp
-    const match = cleanUrl.match(/assets\/([^\/]+\/native\/.+\.(?:png|jpg|jpeg|webp))/i);
+    const match = cleanUrl.match(
+      /assets\/([^\/]+\/native\/.+\.(?:png|jpg|jpeg|webp))/i,
+    );
     return match ? match[1] : null;
   }
 
   function normalizeImageUrl(url) {
-    if (typeof url !== 'string') {
+    if (typeof url !== "string") {
       return url;
     }
-    if (typeof window.__rewriteRemoteUrl === 'function') {
+    if (typeof window.__rewriteRemoteUrl === "function") {
       return window.__rewriteRemoteUrl(url);
     }
     return url;
   }
 
   function buildImageFallbackUrls(url) {
-    const cleanUrl = normalizeImageUrl(url).split('?')[0].split('#')[0];
+    const cleanUrl = normalizeImageUrl(url).split("?")[0].split("#")[0];
     const match = cleanUrl.match(
-      /assets\/([^/]+)\/(native\/[0-9a-f]{2}\/[0-9a-f-]+)\.(png|jpg|jpeg|webp)$/i
+      /assets\/([^/]+)\/(native\/[0-9a-f]{2}\/[0-9a-f-]+)\.(png|jpg|jpeg|webp)$/i,
     );
     if (!match) {
       return [];
@@ -79,15 +83,15 @@
     const ext = match[3];
     const fallbacks = [];
     const candidateBundles = [
-      'mainTraits',
-      'resources',
-      'class',
-      'refactoredResources',
-      'chapter',
-      'jewel',
-      'main',
-      'refactoredMain',
-      'gl_hall',
+      "mainTraits",
+      "resources",
+      "class",
+      "refactoredResources",
+      "chapter",
+      "jewel",
+      "main",
+      "refactoredMain",
+      "gl_hall",
     ];
 
     candidateBundles.forEach((bundle) => {
@@ -113,12 +117,13 @@
   }
 
   function decodeUtf8(uint8Array) {
-    if (typeof TextDecoder !== 'undefined') {
-      return new TextDecoder('utf-8').decode(uint8Array);
+    if (typeof TextDecoder !== "undefined") {
+      return new TextDecoder("utf-8").decode(uint8Array);
     }
     // Fallback (older browsers): this is best-effort
-    let s = '';
-    for (let i = 0; i < uint8Array.length; i++) s += String.fromCharCode(uint8Array[i]);
+    let s = "";
+    for (let i = 0; i < uint8Array.length; i++)
+      s += String.fromCharCode(uint8Array[i]);
     try {
       return decodeURIComponent(escape(s));
     } catch (_) {
@@ -131,14 +136,17 @@
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
     // Prefer native gzip decompression when the file is a raw .gz
-    if (typeof DecompressionStream !== 'undefined' && resp.body) {
+    if (typeof DecompressionStream !== "undefined" && resp.body) {
       try {
-        const ds = new DecompressionStream('gzip');
+        const ds = new DecompressionStream("gzip");
         const decompressedStream = resp.body.pipeThrough(ds);
         const decompressedResp = new Response(decompressedStream);
         return await decompressedResp.arrayBuffer();
       } catch (e) {
-        log.warn('DecompressionStream failed, trying direct arrayBuffer:', e && e.message);
+        log.warn(
+          "DecompressionStream failed, trying direct arrayBuffer:",
+          e && e.message,
+        );
       }
     }
 
@@ -148,17 +156,17 @@
 
   function parseBundle(arrayBuffer) {
     const u8 = new Uint8Array(arrayBuffer);
-    if (u8.length < 8) throw new Error('Bundle too small');
+    if (u8.length < 8) throw new Error("Bundle too small");
 
     const magic = String.fromCharCode(u8[0], u8[1], u8[2], u8[3]);
-    if (magic !== 'IBDL') throw new Error(`Invalid bundle magic: ${magic}`);
+    if (magic !== "IBDL") throw new Error(`Invalid bundle magic: ${magic}`);
 
     const dv = new DataView(arrayBuffer);
     const indexLen = dv.getUint32(4, true);
     const headerLen = 8;
     const indexStart = headerLen;
     const indexEnd = headerLen + indexLen;
-    if (indexEnd > u8.length) throw new Error('Index length out of range');
+    if (indexEnd > u8.length) throw new Error("Index length out of range");
 
     const indexJson = decodeUtf8(u8.subarray(indexStart, indexEnd));
     const index = JSON.parse(indexJson);
@@ -174,13 +182,14 @@
     if (bundleLoadPromise) return bundleLoadPromise;
 
     bundleLoadPromise = (async () => {
-      log.info('Loading image bundle:', CONFIG.bundleUrl);
+      log.info("Loading image bundle:", CONFIG.bundleUrl);
 
       const ab = await fetchAndMaybeDecompressGzip(CONFIG.bundleUrl);
       const parsed = parseBundle(ab);
 
       bundleArrayBuffer = ab;
-      bundleIndex = parsed.index && parsed.index.files ? parsed.index : { files: {} };
+      bundleIndex =
+        parsed.index && parsed.index.files ? parsed.index : { files: {} };
       dataStartOffset = parsed.dataStartOffset;
       bundleLoaded = true;
 
@@ -209,14 +218,19 @@
     const view = new Uint8Array(bundleArrayBuffer, start, entry.l);
     const baseName = window.NativeImageDecrypt
       ? NativeImageDecrypt.baseNameFromPath(relativePath)
-      : relativePath.split('/').pop().replace(/\.[^.]+$/, '');
+      : relativePath
+          .split("/")
+          .pop()
+          .replace(/\.[^.]+$/, "");
     const decrypted = window.NativeImageDecrypt
       ? NativeImageDecrypt.decryptNativeImage(view, baseName)
       : view;
     const mime = window.NativeImageDecrypt
       ? NativeImageDecrypt.mimeFromMagic(decrypted)
-      : (entry.m || 'image/png');
-    return new Blob([decrypted], { type: mime !== 'application/octet-stream' ? mime : (entry.m || 'image/png') });
+      : entry.m || "image/png";
+    return new Blob([decrypted], {
+      type: mime !== "application/octet-stream" ? mime : entry.m || "image/png",
+    });
   }
 
   function deliverImage(original, downloader, url, options, callback) {
@@ -241,7 +255,7 @@
           }
 
           if (index + 1 < urls.length) {
-            log.info('Image miss, trying fallback:', urls[index + 1]);
+            log.info("Image miss, trying fallback:", urls[index + 1]);
             tryDownload(index + 1);
             return;
           }
@@ -258,7 +272,7 @@
         }
 
         if (index + 1 < urls.length) {
-          log.info('Image miss, trying fallback:', urls[index + 1]);
+          log.info("Image miss, trying fallback:", urls[index + 1]);
           tryDownload(index + 1);
           return;
         }
@@ -321,7 +335,7 @@
     if (!downloaders) return false;
 
     downloaderRef = downloader;
-    const exts = ['.png', '.jpg', '.jpeg', '.webp'];
+    const exts = [".png", ".jpg", ".jpeg", ".webp"];
     let changed = false;
 
     if (!installedExtensions) {
@@ -345,7 +359,7 @@
     });
 
     if (changed) {
-      log.info('✓ Image downloader hook installed/ refreshed');
+      log.info("✓ Image downloader hook installed/ refreshed");
     }
     return changed;
   }
@@ -354,7 +368,12 @@
     loadBundle().catch(() => {});
 
     const checkInterval = setInterval(() => {
-      if (typeof cc !== 'undefined' && cc.assetManager && cc.assetManager.downloader && cc.assetManager.downloader._downloaders) {
+      if (
+        typeof cc !== "undefined" &&
+        cc.assetManager &&
+        cc.assetManager.downloader &&
+        cc.assetManager.downloader._downloaders
+      ) {
         installHook();
       }
     }, 50);
@@ -368,8 +387,13 @@
       ...stats,
       elapsedSeconds: elapsed.toFixed(1),
       hitRate:
-        stats.totalRequests > 0 ? ((stats.bundleHits / stats.totalRequests) * 100).toFixed(1) + '%' : '0%',
-      cacheSize: bundleIndex && bundleIndex.files ? Object.keys(bundleIndex.files).length : 0,
+        stats.totalRequests > 0
+          ? ((stats.bundleHits / stats.totalRequests) * 100).toFixed(1) + "%"
+          : "0%",
+      cacheSize:
+        bundleIndex && bundleIndex.files
+          ? Object.keys(bundleIndex.files).length
+          : 0,
       recordingCount: recordedPaths.size,
     };
   }
@@ -377,18 +401,18 @@
   function exportRecordedPaths() {
     const paths = Array.from(recordedPaths).sort();
 
-    console.log('\n========== Recorded Image Paths ==========');
+    console.log("\n========== Recorded Image Paths ==========");
     console.log(`Total: ${paths.length} files\n`);
-    console.log(paths.join('\n'));
-    console.log('\n=========================================');
-    console.log('Copy the paths above to tools/bundle-image-list.txt');
+    console.log(paths.join("\n"));
+    console.log("\n=========================================");
+    console.log("Copy the paths above to tools/bundle-image-list.txt");
 
     return paths;
   }
 
   function report() {
     const s = getStats();
-    console.log('\n=== ImageBundleLoader Report ===');
+    console.log("\n=== ImageBundleLoader Report ===");
     console.log(`Total Requests: ${s.totalRequests}`);
     console.log(`Bundle Hits: ${s.bundleHits}`);
     console.log(`Bundle Misses: ${s.bundleMisses}`);
@@ -396,7 +420,7 @@
     console.log(`Cache Size: ${s.cacheSize} files`);
     console.log(`Elapsed: ${s.elapsedSeconds}s`);
     console.log(`Recorded Paths: ${s.recordingCount}`);
-    console.log('===============================\n');
+    console.log("===============================\n");
     return s;
   }
 
@@ -405,14 +429,16 @@
 
     setDebug: (enabled) => {
       CONFIG.debug = enabled;
-      console.log('[ImageBundleLoader] Debug:', enabled ? 'ON' : 'OFF');
+      console.log("[ImageBundleLoader] Debug:", enabled ? "ON" : "OFF");
     },
 
     setRecording: (enabled) => {
       CONFIG.recording = enabled;
-      console.log('[ImageBundleLoader] Recording:', enabled ? 'ON' : 'OFF');
+      console.log("[ImageBundleLoader] Recording:", enabled ? "ON" : "OFF");
       if (enabled) {
-        console.log('Play to first level, then call ImageBundleLoader.exportRecordedPaths()');
+        console.log(
+          "Play to first level, then call ImageBundleLoader.exportRecordedPaths()",
+        );
       }
     },
 
@@ -422,7 +448,7 @@
 
     clearRecordedPaths: () => {
       recordedPaths.clear();
-      console.log('[ImageBundleLoader] Recorded paths cleared');
+      console.log("[ImageBundleLoader] Recorded paths cleared");
     },
 
     getStats,
@@ -432,17 +458,17 @@
     loadBundle,
   };
 
-  Object.defineProperty(window, 'imageBundleRecordedPaths', {
+  Object.defineProperty(window, "imageBundleRecordedPaths", {
     get: () => Array.from(recordedPaths),
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hookCocosDownloader);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hookCocosDownloader);
   } else {
     hookCocosDownloader();
   }
 
-  log.info('ImageBundleLoader v1 initialized');
+  log.info("ImageBundleLoader v1 initialized");
   // 为了和 json 方案一致：默认开启记录（你也可以在控制台关掉）
   ImageBundleLoader.setRecording(false);
 })();
