@@ -161710,6 +161710,15 @@ window.__require = (function e(t, o, n) {
                     } catch (e) {}
                     return;
                   }
+                  if ("chat" === msg.k) {
+                    try {
+                      if ("function" == typeof window.__pvpOnPeerChat)
+                        window.__pvpOnPeerChat(msg);
+                    } catch (e) {
+                      console.warn("[pvp-peerjs] chat handler fail", e);
+                    }
+                    return;
+                  }
                   if ("bye" === msg.k) {
                     var byeReason =
                       "leave" === msg.reason || "home" === msg.reason
