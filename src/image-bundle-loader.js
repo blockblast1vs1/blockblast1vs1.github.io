@@ -23,6 +23,7 @@
   const CONFIG = {
     bundleUrl:
       "https://pub-884738475c4b45d5aa9108b09fd6e501.r2.dev/bundle.bin.gz",
+    localBundleUrl: "img-bundles/bundle.bin.gz",
     debug: false,
     recording: false,
   };
@@ -132,7 +133,7 @@
   }
 
   async function fetchAndMaybeDecompressGzip(url) {
-    const resp = await fetch(url);
+    const resp = await fetch(url, { mode: "cors", credentials: "omit" });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
     // Prefer native gzip decompression when the file is a raw .gz
@@ -184,7 +185,18 @@
     bundleLoadPromise = (async () => {
       log.info("Loading image bundle:", CONFIG.bundleUrl);
 
-      const ab = await fetchAndMaybeDecompressGzip(CONFIG.bundleUrl);
+      let ab;
+      try {
+        ab = await fetchAndMaybeDecompressGzip(CONFIG.bundleUrl);
+      } catch (remoteErr) {
+        if (CONFIG.localBundleUrl && CONFIG.localBundleUrl !== CONFIG.bundleUrl) {
+          log.warn("Remote image bundle failed, trying local:", remoteErr.message);
+          ab = await fetchAndMaybeDecompressGzip(CONFIG.localBundleUrl);
+        } else {
+          throw remoteErr;
+        }
+      }
+
       const parsed = parseBundle(ab);
 
       bundleArrayBuffer = ab;

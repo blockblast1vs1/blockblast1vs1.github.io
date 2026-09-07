@@ -84,6 +84,82 @@ body.game-ready #Cocos2dGameContainer {
   visibility: visible;
 }
 
+/* Facebook Instant Games profile overlay host (Meta iframe goes inside) */
+#fb-profile-overlay {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: max(12px, env(safe-area-inset-left, 0px));
+  z-index: 40;
+  /* Room for pill + shadow; do not clip (was causing cut-off right edge) */
+  width: min(280px, 72vw);
+  height: 64px;
+  display: none;
+  pointer-events: none;
+  overflow: visible;
+  background: transparent;
+}
+
+#fb-profile-overlay.is-visible {
+  display: block;
+}
+
+#fb-profile-overlay iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  pointer-events: none;
+  overflow: visible !important;
+}
+
+#fb-profile-overlay .fb-profile-local {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  height: 44px;
+  margin: 4px;
+  padding: 5px 16px 5px 5px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    165deg,
+    rgba(28, 52, 110, 0.92) 0%,
+    rgba(10, 24, 58, 0.94) 100%
+  );
+  border-radius: 22px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 6px 16px rgba(0, 12, 40, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#fb-profile-overlay .fb-profile-local-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #5ec4ff, #1a4fad);
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+#fb-profile-overlay .fb-profile-local-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  padding-right: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
 /* —— Splash —— */
 #splash {
   --splash-blue: #1a4fad;

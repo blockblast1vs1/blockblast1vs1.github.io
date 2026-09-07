@@ -1,0 +1,3 @@
+<View className="pvpNameChip">
+  <Text content="{{FBInstant.player.name}}" className="pvpNameText" />
+</View>

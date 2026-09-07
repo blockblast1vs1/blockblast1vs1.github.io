@@ -149,6 +149,12 @@ window.boot = function () {
         }
     }
 
+    function reportFbProgress (value) {
+        if (window.FBInstantBridge && typeof window.FBInstantBridge.setProgress === 'function') {
+            window.FBInstantBridge.setProgress(value);
+        }
+    }
+
     function showGameCanvas () {
         document.body.classList.add('game-ready');
         hideSplash();
@@ -160,11 +166,18 @@ window.boot = function () {
         if (container) {
             container.style.visibility = 'visible';
         }
+        if (window.FBInstantBridge && typeof window.FBInstantBridge.notifyGameReady === 'function') {
+            window.FBInstantBridge.notifyGameReady();
+        }
     }
 
     function setLoadingDisplay () {
         // Keep HTML splash until first scene launches (avoids black WebGL flash)
-        onProgress = null;
+        onProgress = function (finish, total) {
+            if (!total) return;
+            // Scene load maps to 70–95%
+            reportFbProgress(70 + Math.floor((25 * finish) / total));
+        };
         cc.director.once(cc.Director.EVENT_AFTER_SCENE_LAUNCH, showGameCanvas);
     }
 
@@ -251,12 +264,19 @@ window.boot = function () {
     settings.hasResourcesBundle && bundleRoot.push(RESOURCES);
 
     var count = 0;
+    var totalSteps = bundleRoot.length + 1;
     function cb (err) {
         if (err) return console.error(err.message, err.stack);
         count++;
-        if (count === bundleRoot.length + 1) {
+        // Bundle phase: 40–65%
+        reportFbProgress(40 + Math.floor((25 * count) / totalSteps));
+        if (count === totalSteps) {
+            reportFbProgress(68);
             cc.assetManager.loadBundle(MAIN, function (err) {
-                if (!err) cc.game.run(option, onStart);
+                if (!err) {
+                    reportFbProgress(70);
+                    cc.game.run(option, onStart);
+                }
             });
         }
     }

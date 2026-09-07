@@ -19,9 +19,9 @@
 
   // 配置
   const CONFIG = {
-    // bundle文件路径 (使用gzip压缩版本)
     bundleUrl:
       "https://pub-884738475c4b45d5aa9108b09fd6e501.r2.dev/bundle.json.gz",
+    localBundleUrl: "json-bundles/bundle.json.gz",
     // 是否启用调试日志
     debug: false,
     // 是否启用路径记录
@@ -107,9 +107,21 @@
       try {
         log.info("Loading bundle:", CONFIG.bundleUrl);
 
-        const response = await fetch(CONFIG.bundleUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+        let response;
+        try {
+          response = await fetch(CONFIG.bundleUrl, {
+            mode: "cors",
+            credentials: "omit",
+          });
+          if (!response.ok) throw new Error("HTTP " + response.status);
+        } catch (remoteErr) {
+          if (!CONFIG.localBundleUrl) throw remoteErr;
+          log.warn(
+            "Remote JSON bundle failed, trying local:",
+            remoteErr && remoteErr.message,
+          );
+          response = await fetch(CONFIG.localBundleUrl);
+          if (!response.ok) throw new Error("HTTP " + response.status);
         }
 
         // 解压gzip
@@ -138,7 +150,7 @@
         log.warn("Failed to load bundle:", e.message);
         jsonCache = {};
         bundleLoaded = true;
-        throw e;
+        return jsonCache;
       }
     })();
 

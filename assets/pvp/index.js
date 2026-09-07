@@ -100068,7 +100068,9 @@ window.__require = (function e(t, o, n) {
                     var pl = this._data.players[i];
                     if (!pl) continue;
                     if (
-                      _.default.getModel(m.PVPUserModel).isLocalPlayer(pl.userId)
+                      _.default
+                        .getModel(m.PVPUserModel)
+                        .isLocalPlayer(pl.userId)
                     ) {
                       if (info) {
                         if (null != pl.WinNum) info.WinNum = pl.WinNum;
@@ -100097,9 +100099,7 @@ window.__require = (function e(t, o, n) {
                 g.PVPData.ins.user_name = "You";
               } else {
                 myName =
-                  (info && info.nickname) ||
-                  g.PVPData.ins.user_name ||
-                  "You";
+                  (info && info.nickname) || g.PVPData.ins.user_name || "You";
                 otherName = (this._data && this._data.otherName) || "--";
               }
               if (info && sync) info.nickname = "You";
@@ -120421,8 +120421,7 @@ window.__require = (function e(t, o, n) {
                 this._reconnectCount = 0;
                 this.clearReconnectTimer();
                 this.simulateOnRespone();
-                if (this._socket)
-                  this._socket.updateState(f.NetworkState.Open);
+                if (this._socket) this._socket.updateState(f.NetworkState.Open);
                 i.MessageManager.emit(
                   i.PVP99NetEvent.NETWORK_RECONNECT,
                   f.ReconnectState.LoginSucess,
@@ -160870,7 +160869,10 @@ window.__require = (function e(t, o, n) {
               // PeerJS-only host authority (NOT OfflineInterceptor)
               function peerWlLoad() {
                 try {
-                  return JSON.parse(localStorage.getItem("pvp_peer_wl") || "{}") || {};
+                  return (
+                    JSON.parse(localStorage.getItem("pvp_peer_wl") || "{}") ||
+                    {}
+                  );
                 } catch (err) {
                   return {};
                 }
@@ -160981,8 +160983,7 @@ window.__require = (function e(t, o, n) {
                 function () {
                   if (this._drawEmitted || !this._sock || !this._guestId)
                     return;
-                  var elapsed =
-                    (Date.now() - this._matchBeginMs) / 1e3;
+                  var elapsed = (Date.now() - this._matchBeginMs) / 1e3;
                   // Prefer live game clock if available
                   try {
                     if (
@@ -161000,54 +161001,52 @@ window.__require = (function e(t, o, n) {
                   } catch (e) {}
                   if (elapsed >= this._matchDuration) this._emitDrawTimeout();
                 };
-              PeerSyncHostInterceptor.prototype._emitDrawTimeout =
-                function () {
-                  if (this._drawEmitted) return;
-                  this._drawEmitted = !0;
-                  this._stopDrawTimer();
-                  var o = this._sock;
-                  if (!o || !this._guestId) return;
-                  var hostId = o.playerUID,
-                    guestId = this._guestId,
-                    sh = peerWlGet(hostId),
-                    sg = peerWlGet(guestId);
-                  // DRAW=2, TIME_OUT=11 — no W-L change
-                  console.log("[pvp-peerjs] TIME_OUT → DRAW", hostId, guestId);
-                  try {
-                    if (window.__pvpPeerSync)
-                      window.__pvpPeerSync.inMatch = !1;
-                  } catch (err) {}
-                  o.emit(proto.GameMessageDefine.META_TYPE_GameACK, {
-                    gameOverRsp: {
-                      deskInfo: {
-                        players: [
-                          {
-                            UserID: hostId,
-                            result: 2,
-                            isRobot: !1,
-                            WinNum: sh.WinNum,
-                            LoseNum: sh.LoseNum,
-                            TotalNum: sh.TotalNum,
-                            loseNum: sh.loseNum,
-                          },
-                          {
-                            UserID: guestId,
-                            result: 2,
-                            isRobot: !1,
-                            WinNum: sg.WinNum,
-                            LoseNum: sg.LoseNum,
-                            TotalNum: sg.TotalNum,
-                            loseNum: sg.loseNum,
-                          },
-                        ],
-                      },
-                      reason: 11,
+              PeerSyncHostInterceptor.prototype._emitDrawTimeout = function () {
+                if (this._drawEmitted) return;
+                this._drawEmitted = !0;
+                this._stopDrawTimer();
+                var o = this._sock;
+                if (!o || !this._guestId) return;
+                var hostId = o.playerUID,
+                  guestId = this._guestId,
+                  sh = peerWlGet(hostId),
+                  sg = peerWlGet(guestId);
+                // DRAW=2, TIME_OUT=11 — no W-L change
+                console.log("[pvp-peerjs] TIME_OUT → DRAW", hostId, guestId);
+                try {
+                  if (window.__pvpPeerSync) window.__pvpPeerSync.inMatch = !1;
+                } catch (err) {}
+                o.emit(proto.GameMessageDefine.META_TYPE_GameACK, {
+                  gameOverRsp: {
+                    deskInfo: {
+                      players: [
+                        {
+                          UserID: hostId,
+                          result: 2,
+                          isRobot: !1,
+                          WinNum: sh.WinNum,
+                          LoseNum: sh.LoseNum,
+                          TotalNum: sh.TotalNum,
+                          loseNum: sh.loseNum,
+                        },
+                        {
+                          UserID: guestId,
+                          result: 2,
+                          isRobot: !1,
+                          WinNum: sg.WinNum,
+                          LoseNum: sg.LoseNum,
+                          TotalNum: sg.TotalNum,
+                          loseNum: sg.loseNum,
+                        },
+                      ],
                     },
-                    ResultCode: 0,
-                    Message: "gameOverRsp",
-                  });
-                  o.simulateOnRespone();
-                };
+                    reason: 11,
+                  },
+                  ResultCode: 0,
+                  Message: "gameOverRsp",
+                });
+                o.simulateOnRespone();
+              };
               PeerSyncHostInterceptor.prototype.interceptBinaryRequest =
                 function (e, t, o) {
                   if (e === proto.GameMessageDefine.META_TYPE_PingACK) {
@@ -161097,16 +161096,10 @@ window.__require = (function e(t, o, n) {
                           senderId === o.playerUID
                             ? this._guestId
                             : o.playerUID,
-                        senderResult =
-                          null != go.result ? go.result : 1,
+                        senderResult = null != go.result ? go.result : 1,
                         otherResult =
-                          1 === senderResult
-                            ? 0
-                            : 0 === senderResult
-                              ? 1
-                              : 2;
-                      if (0 === senderResult)
-                        peerWlApply(senderId, otherId);
+                          1 === senderResult ? 0 : 0 === senderResult ? 1 : 2;
+                      if (0 === senderResult) peerWlApply(senderId, otherId);
                       else if (1 === senderResult)
                         peerWlApply(otherId, senderId);
                       var ss = peerWlGet(senderId),
@@ -161163,11 +161156,14 @@ window.__require = (function e(t, o, n) {
                       },
                     );
                     if (t.cancelMatchReq) {
-                      o.emit(proto.GameMessageDefine.META_TYPE_UserMatchMessage, {
-                        cancelMatchRsp: {
-                          ErrCode: 0,
+                      o.emit(
+                        proto.GameMessageDefine.META_TYPE_UserMatchMessage,
+                        {
+                          cancelMatchRsp: {
+                            ErrCode: 0,
+                          },
                         },
-                      });
+                      );
                     } else if (
                       t.randomMatchReq ||
                       t.botMatchReq ||
@@ -161187,9 +161183,7 @@ window.__require = (function e(t, o, n) {
                         this._guestId = null;
                       }
                       if (!this._guestId) {
-                        console.warn(
-                          "[pvp-peerjs] Match: Guest хүлээж байна…",
-                        );
+                        console.warn("[pvp-peerjs] Match: Guest хүлээж байна…");
                         this._pendingMatch = {
                           sock: o,
                         };
@@ -161297,8 +161291,7 @@ window.__require = (function e(t, o, n) {
                   n._pendingMatch = null;
                   n._startDrawTimer(o, beginMs, durationSec);
                   try {
-                    if (window.__pvpPeerSync)
-                      window.__pvpPeerSync.inMatch = !0;
+                    if (window.__pvpPeerSync) window.__pvpPeerSync.inMatch = !0;
                   } catch (err) {}
                 }, 100);
               };
@@ -161330,8 +161323,7 @@ window.__require = (function e(t, o, n) {
                     var ic = new PeerSyncHostInterceptor();
                     if (window.__pvpPeerSync && window.__pvpPeerSync.guestUid) {
                       ic._guestId = window.__pvpPeerSync.guestUid;
-                      ic._guestName =
-                        window.__pvpPeerSync.guestName || "Guest";
+                      ic._guestName = window.__pvpPeerSync.guestName || "Guest";
                     }
                     sock.addInterceptor(ic);
                     window.__peerSyncHostIc = ic;
@@ -161342,9 +161334,7 @@ window.__require = (function e(t, o, n) {
                     );
                   } else if ("guest" === role) {
                     window.__peerSyncHostIc = null;
-                    console.log(
-                      "[pvp-peerjs] Guest — Host authority only",
-                    );
+                    console.log("[pvp-peerjs] Guest — Host authority only");
                   }
                 }
                 tryInstall();
@@ -161433,9 +161423,7 @@ window.__require = (function e(t, o, n) {
                 }, delay);
               };
               if ("undefined" == typeof Peer) {
-                s.PvpLogger.log(
-                  "PeerJS missing — add peerjs.min.js to jsList",
-                );
+                s.PvpLogger.log("PeerJS missing — add peerjs.min.js to jsList");
                 setTimeout(function () {
                   t.readyState = 3;
                   t.onerror && t.onerror(new Event("error"));
@@ -161710,11 +161698,15 @@ window.__require = (function e(t, o, n) {
                     } catch (e) {}
                     return;
                   }
+                  if ("chat" === msg.k) {
+                    try {
+                      window.__pvpOnPeerChat && window.__pvpOnPeerChat(msg);
+                    } catch (e) {}
+                    return;
+                  }
                   if ("bye" === msg.k) {
                     var byeReason =
-                      "leave" === msg.reason || "home" === msg.reason
-                        ? 10
-                        : 12;
+                      "leave" === msg.reason || "home" === msg.reason ? 10 : 12;
                     handleRemotePeerLeft(byeReason);
                     return;
                   }
@@ -161749,10 +161741,7 @@ window.__require = (function e(t, o, n) {
                   }
                   if ("s2c" === msg.k && "guest" === sync.role && sock) {
                     try {
-                      if (
-                        msg.data &&
-                        "gameStart" === msg.data.Message
-                      )
+                      if (msg.data && "gameStart" === msg.data.Message)
                         sync.inMatch = !0;
                       if (
                         msg.data &&
@@ -161871,8 +161860,7 @@ window.__require = (function e(t, o, n) {
                 function sendGuestHello() {
                   if ("guest" !== sync.role) return;
                   var sock = window.__PVPSocketIns;
-                  sync.guestName =
-                    "Guest" + String(sync.myUid || "").slice(-4);
+                  sync.guestName = "Guest" + String(sync.myUid || "").slice(-4);
                   if (sock && sync.myUid) sock.playerUID = sync.myUid;
                   sync.send({
                     k: "hello",
@@ -162007,10 +161995,7 @@ window.__require = (function e(t, o, n) {
                           } catch (e) {}
                           return;
                         }
-                        if (
-                          choice.mode === "bot" ||
-                          choice.role === "bot"
-                        ) {
+                        if (choice.mode === "bot" || choice.role === "bot") {
                           t.readyState = 3;
                           try {
                             localStorage.setItem("pvp_play_bot", "1");
@@ -162143,10 +162128,7 @@ window.__require = (function e(t, o, n) {
                     }, 0);
                     return;
                   }
-                  if (
-                    choice.mode === "bot" ||
-                    choice.role === "bot"
-                  ) {
+                  if (choice.mode === "bot" || choice.role === "bot") {
                     setTimeout(function () {
                       try {
                         t.onopen = t.onmessage = t.onerror = t.onclose = null;

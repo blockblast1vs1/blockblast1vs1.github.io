@@ -173,12 +173,244 @@
       .then(function (choice) {
         openPvpModePicker._busy = false;
         if (!choice || choice.cancelled) return;
+
+        if (choice.mode === "random") {
+          var bridge = window.FBInstantBridge;
+          var onFb =
+            bridge &&
+            typeof bridge.isInstant === "function" &&
+            bridge.isInstant();
+          if (!onFb) {
+            console.warn("[web-pvp] Random Match is Facebook Instant only");
+            return;
+          }
+          if (!window.PvpRandomMatch || !window.PvpRandomMatch.matchUrl()) {
+            console.warn("[web-pvp] PvpRandomMatch / Worker URL missing");
+            alert("Random Match needs Cloudflare Worker URL");
+            return;
+          }
+          // Enter PvP first so original MatchWaitingUI prefab can load from bundle,
+          // then chooseRole runs CF matchmaking with that UI.
+          window.__pvpRandomPending = true;
+          try {
+            window.FBInstantFriends &&
+              window.FBInstantFriends.clearFriendsSession &&
+              window.FBInstantFriends.clearFriendsSession();
+          } catch (e) {}
+          enterPvp("online");
+          return;
+        }
+
         enterPvp(choice.mode === "bot" ? "bot" : "online");
       })
       .catch(function (err) {
         openPvpModePicker._busy = false;
         console.warn("[web-pvp] mode picker failed", err);
       });
+  }
+
+  /** Empty local gl_hall stub has no scenes → Error 1209; treat preload as OK so StartScene can leave Adventure splash. */
+  function installGlHallPreloadGuard() {
+    if (installGlHallPreloadGuard._done) return true;
+    if (!window.cc || !cc.director || typeof cc.director.preloadScene !== "function") {
+      return false;
+    }
+    installGlHallPreloadGuard._done = true;
+    var orig = cc.director.preloadScene.bind(cc.director);
+    cc.director.preloadScene = function (sceneName, a, b) {
+      if (String(sceneName) === "gl_hall") {
+        var onLoaded = typeof b === "function" ? b : typeof a === "function" ? a : null;
+        console.warn(
+          "[web-pvp] skip gl_hall preload (empty stub) — avoid Error 1209 / stuck splash",
+        );
+        if (onLoaded) {
+          setTimeout(function () {
+            try {
+              onLoaded(null);
+            } catch (e) {}
+          }, 0);
+        }
+        return;
+      }
+      if (typeof b === "function") return orig(sceneName, a, b);
+      return orig(sceneName, a);
+    };
+    return true;
+  }
+
+  function showFriendsJoinOverlay(code) {
+    var id = "pvp-friends-join-overlay";
+    if (document.getElementById(id)) return;
+    var el = document.createElement("div");
+    el.id = id;
+    el.setAttribute(
+      "style",
+      "position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;" +
+        "background:rgba(7,26,50,0.92);color:#e8f4ff;font-family:sans-serif;text-align:center;padding:24px;",
+    );
+    el.innerHTML =
+      '<div><div style="font-size:20px;font-weight:700;margin-bottom:8px;">Opening room…</div>' +
+      '<div style="font-size:14px;opacity:0.85;margin-bottom:16px;">Code ' +
+      String(code || "") +
+      "</div>" +
+      '<div style="width:36px;height:36px;margin:0 auto;border:3px solid rgba(255,255,255,0.25);' +
+      'border-top-color:#4db7ff;border-radius:50%;animation:pvpJoinSpin 0.8s linear infinite;"></div></div>';
+    if (!document.getElementById("pvp-friends-join-style")) {
+      var st = document.createElement("style");
+      st.id = "pvp-friends-join-style";
+      st.textContent =
+        "@keyframes pvpJoinSpin{to{transform:rotate(360deg)}}";
+      document.head.appendChild(st);
+    }
+    document.body.appendChild(el);
+  }
+
+  function hideFriendsJoinOverlay() {
+    var el = document.getElementById("pvp-friends-join-overlay");
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  }
+
+  function isHtmlSplashGone() {
+    try {
+      if (document.body && document.body.classList.contains("game-ready")) {
+        return true;
+      }
+      var splash = document.getElementById("splash");
+      if (!splash) return true;
+      var style = window.getComputedStyle
+        ? window.getComputedStyle(splash)
+        : null;
+      if (style && (style.display === "none" || style.visibility === "hidden")) {
+        return true;
+      }
+      return splash.style.display === "none";
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function isHomeSceneReady() {
+    try {
+      var scene = cc.director && cc.director.getScene && cc.director.getScene();
+      var name = (scene && scene.name) || "";
+      // Strict: only real home (Adventure/StartScene splash must be gone)
+      if (name === "StartGameScene2") return true;
+      if (findHomeBtnNode()) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  function isBootFullyReady() {
+    if (!window.cc || !cc.assetManager || !cc.director) return false;
+    if (!isHtmlSplashGone()) return false;
+    if (!isHomeSceneReady()) return false;
+    return true;
+  }
+
+  /** Block home/game scenes from replacing PvP only AFTER invite has entered PvP. */
+  function installInviteSceneLock() {
+    if (installInviteSceneLock._done) return true;
+    if (!window.cc || !cc.director || typeof cc.director.loadScene !== "function") {
+      return false;
+    }
+    installInviteSceneLock._done = true;
+    var origLoad = cc.director.loadScene.bind(cc.director);
+    cc.director.loadScene = function (name) {
+      var n = String(name || "");
+      if (
+        window.__pvpFriendsInviteLock &&
+        (n === "StartGameScene2" ||
+          n === "StartScene" ||
+          n.indexOf("NewComob") === 0)
+      ) {
+        var cur = "";
+        try {
+          cur = (cc.director.getScene() && cc.director.getScene().name) || "";
+        } catch (e) {}
+        if (cur === "pvp" || /pvp/i.test(cur)) {
+          console.warn(
+            "[web-pvp] blocked scene switch during friends invite join:",
+            n,
+          );
+          return;
+        }
+      }
+      return origLoad.apply(cc.director, arguments);
+    };
+    return true;
+  }
+
+  /**
+   * Friend opened Messenger invite.
+   * Wait until splash + home boot finish, THEN enter PvP and show room.
+   */
+  function enterPvpFromFriendsInvite(code) {
+    if (!code) return;
+    if (enterPvpFromFriendsInvite._armed) return;
+    enterPvpFromFriendsInvite._armed = true;
+
+    console.log(
+      "[web-pvp] friends invite queued — wait splash/home, then show room",
+      code,
+    );
+    try {
+      localStorage.setItem("pvp_peer_host", code);
+      localStorage.setItem("pvp_peer_role", "guest");
+    } catch (e) {}
+
+    // Do NOT show room / join overlay yet — let normal splash + StartScene finish
+    var tries = 0;
+    var wait = setInterval(function () {
+      tries++;
+      installGlHallPreloadGuard();
+      installInviteSceneLock();
+
+      if (!window.cc || !cc.assetManager || !cc.director) {
+        if (tries > 200) {
+          clearInterval(wait);
+          enterPvpFromFriendsInvite._armed = false;
+          console.warn("[web-pvp] friends invite timed out — cc never ready");
+        }
+        return;
+      }
+
+      // Require HTML splash gone + StartGameScene2 home. Soft fallback ~20s.
+      var ready = isBootFullyReady();
+      var fallback = tries >= 80;
+      if (!ready && !fallback) return;
+
+      clearInterval(wait);
+
+      // Brief settle so home UI finishes layout before we cut to PvP room
+      var settleMs = ready ? 600 : 0;
+      console.log(
+        "[web-pvp] boot ready for invite join (ready=",
+        ready,
+        "tries=",
+        tries,
+        ") — show room in",
+        settleMs,
+        "ms",
+      );
+
+      setTimeout(function () {
+        showFriendsJoinOverlay(code);
+        // Lock only after we start entering PvP (home was allowed to load)
+        window.__pvpFriendsInviteLock = true;
+        enterPvp("online");
+        setTimeout(function () {
+          window.__pvpFriendsInviteLock = false;
+          hideFriendsJoinOverlay();
+          enterPvpFromFriendsInvite._armed = false;
+        }, 10000);
+      }, settleMs);
+    }, 250);
+  }
+
+  if (window.FBInstantFriends) {
+    window.FBInstantFriends._onInviteJoin = enterPvpFromFriendsInvite;
+  } else {
+    window.__pvpPendingFriendsHook = enterPvpFromFriendsInvite;
   }
 
   function installHomePvpClick(pvp) {
@@ -223,6 +455,8 @@
 
   function startHomeBtnSwapWatcher() {
     function onSceneReady() {
+      installGlHallPreloadGuard();
+      installInviteSceneLock();
       applyHomeAdventureToPvp();
       setTimeout(applyHomeAdventureToPvp, 200);
       setTimeout(applyHomeAdventureToPvp, 800);
@@ -277,9 +511,12 @@
     bundle.loadScene("scene/pvp", function (e2, scene) {
       if (e2) {
         console.error("[web-pvp] loadScene failed", e2);
+        hideFriendsJoinOverlay();
+        window.__pvpFriendsInviteLock = false;
         return;
       }
       cc.director.runScene(scene);
+      hideFriendsJoinOverlay();
       console.log(
         "[web-pvp] entered scene/pvp as",
         FORCE_OFFLINE ? "bot" : "online",
@@ -366,7 +603,22 @@
     startHomeBtnSwapWatcher();
   }
 
+  // Install gl_hall guard as soon as cc exists (before StartScene failHot)
+  (function earlyGlHallGuard() {
+    if (installGlHallPreloadGuard()) return;
+    var t = setInterval(function () {
+      if (installGlHallPreloadGuard()) clearInterval(t);
+    }, 50);
+    setTimeout(function () {
+      clearInterval(t);
+    }, 60000);
+  })();
+
+  if (window.FBInstantFriends) {
+    window.FBInstantFriends._onInviteJoin = enterPvpFromFriendsInvite;
+  }
+
   console.log(
-    "[web-pvp] enabled — single index.js; Online/Bot via flags (lazy deps, no boot prefetch)",
+    "[web-pvp] enabled — Online / Bot / Friends (lazy deps, no boot prefetch)",
   );
 })();

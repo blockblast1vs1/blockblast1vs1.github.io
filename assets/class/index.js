@@ -9423,6 +9423,14 @@ o.sent().getComponent(g.default).setState({
 score: e,
 highScore: t
 });
+try {
+console.log("[FBInstant] ClassFail.openUI score=", e, "high=", t);
+if (e > 0 && "function" == typeof window.notifyFBGameOver) {
+window.notifyFBGameOver(e, t);
+}
+} catch (fbErr) {
+console.warn("[FBInstant] ClassFail notify failed", fbErr);
+}
 s.EventManager.dispatchModuleEvent(new m.E_ClassGameOver_ShowFinish());
 DS("usr_data_end_ui_show");
 return [ 2 ];

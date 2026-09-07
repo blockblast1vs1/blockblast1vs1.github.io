@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "start": "node tools/serve.js",
-    "start:plain": "http-server . -p 8080 -c-1 --cors"
+    "start:plain": "http-server . -p 8080 -c-1 --cors",
+    "start:fb": "node tools/serve-fb-ssl.js",
+    "cert:localhost": "openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 1000 -nodes -subj \"/CN=localhost\" -addext \"subjectAltName=DNS:localhost,IP:127.0.0.1\""
   },
   "devDependencies": {
     "compression": "^1.8.1",
