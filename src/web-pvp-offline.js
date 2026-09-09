@@ -175,22 +175,12 @@
         if (!choice || choice.cancelled) return;
 
         if (choice.mode === "random") {
-          var bridge = window.FBInstantBridge;
-          var onFb =
-            bridge &&
-            typeof bridge.isInstant === "function" &&
-            bridge.isInstant();
-          if (!onFb) {
-            console.warn("[web-pvp] Random Match is Facebook Instant only");
-            return;
-          }
           if (!window.PvpRandomMatch || !window.PvpRandomMatch.matchUrl()) {
-            console.warn("[web-pvp] PvpRandomMatch / Worker URL missing");
-            alert("Random Match needs Cloudflare Worker URL");
+            console.warn("[web-pvp] PvpRandomMatch / Socket URL missing");
+            alert("Random Match needs __PVP_SOCKET_URL (Northflank)");
             return;
           }
-          // Enter PvP first so original MatchWaitingUI prefab can load from bundle,
-          // then chooseRole runs CF matchmaking with that UI.
+          // Enter PvP first so MatchWaitingUI can load, then chooseRole runs matchmaking.
           window.__pvpRandomPending = true;
           try {
             window.FBInstantFriends &&

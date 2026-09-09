@@ -138,10 +138,7 @@
     ensureStyle();
     removeRoot();
     return new Promise(function (resolve) {
-      // Random Match only inside Facebook Instant Games
-      var onFacebook = isFacebookInstant();
       var canRandom =
-        onFacebook &&
         window.PvpRandomMatch &&
         typeof window.PvpRandomMatch.findMatch === "function" &&
         typeof window.PvpRandomMatch.matchUrl === "function" &&
@@ -153,23 +150,17 @@
         '<div class="pvp-room-backdrop" data-act="cancel"></div>' +
         '<div class="pvp-room-card" role="dialog" aria-modal="true">' +
         '<h2 class="pvp-room-title">PvP</h2>' +
-        '<p class="pvp-room-sub">' +
-        (onFacebook
-          ? "Random Match, Online room, or Bot"
-          : "Choose Online (PeerJS) or Bot (offline)") +
-        "</p>" +
+        '<p class="pvp-room-sub">Random Match, Online room, or Bot</p>' +
         '<div class="pvp-room-actions">' +
-        (onFacebook
-          ? '<button type="button" class="pvp-room-btn pvp-room-btn-friends" data-act="random"' +
-            (canRandom ? "" : ' disabled style="opacity:0.55"') +
-            ">Random Match</button>"
-          : "") +
+        '<button type="button" class="pvp-room-btn pvp-room-btn-friends" data-act="random"' +
+        (canRandom ? "" : ' disabled style="opacity:0.55"') +
+        ">Random Match</button>" +
         '<button type="button" class="pvp-room-btn pvp-room-btn-primary" data-act="online">Online</button>' +
         '<button type="button" class="pvp-room-btn pvp-room-btn-bot" data-act="bot">Bot</button>' +
         '<button type="button" class="pvp-room-btn pvp-room-btn-ghost" data-act="cancel">Cancel</button>' +
         "</div>" +
-        (onFacebook && !canRandom
-          ? '<p class="pvp-room-hint">Random Match needs Cloudflare Worker URL</p>'
+        (!canRandom
+          ? '<p class="pvp-room-hint">Random Match needs __PVP_SOCKET_URL (Northflank)</p>'
           : "") +
         '<div class="pvp-room-toast"></div>' +
         "</div>";
@@ -191,12 +182,8 @@
           return;
         }
         if ("random" === act) {
-          if (!onFacebook) {
-            showToast(root, "Random Match is Facebook only");
-            return;
-          }
           if (!canRandom) {
-            showToast(root, "Set __PVP_MATCH_URL first");
+            showToast(root, "Set __PVP_SOCKET_URL first");
             return;
           }
           try {
@@ -239,14 +226,14 @@
   }
 
   function chooseRole(errorMsg) {
-    // Random Match pending: show original MatchWaitingUI + CF Worker, then auto role
+    // Random Match pending: show original MatchWaitingUI + match server, then auto role
     if (
       window.__pvpRandomPending &&
       window.PvpRandomMatch &&
       typeof window.PvpRandomMatch.runPendingMatchForRole === "function"
     ) {
       console.log(
-        "[pvp-room-ui] random pending → native MatchWaitingUI + CF match",
+        "[pvp-room-ui] random pending → native MatchWaitingUI + match",
       );
       return window.PvpRandomMatch.runPendingMatchForRole()
         .then(function (role) {

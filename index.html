@@ -7,12 +7,16 @@
     <script>
       // Bump only when our patch scripts change (not cocos engine).
       // Facebook zip upload already busts cache; this helps local HTTPS / CDN.
-      window.__ASSET_VER = "20260827.37";
+      window.__ASSET_VER = "20260909.2";
       window.__assetUrl = function (path) {
         var ver = window.__ASSET_VER;
         if (!ver || path.indexOf("?") !== -1) return path;
         return path + "?v=" + ver;
       };
+      // Northflank Socket.io matchmaking
+      window.__PVP_SOCKET_URL = "https://p01--pvp--2vwz4pdqw5s9.code.run";
+      // Legacy Cloudflare Worker (used only if __PVP_SOCKET_URL is empty):
+      // window.__PVP_MATCH_URL = "https://blockblast-pvp-match.….workers.dev";
     </script>
     <!-- Facebook Instant Games SDK (skip if platform already injected it) -->
     <script>
@@ -107,9 +111,9 @@
     ></script>
     <script src="src/web-adapter.js?v=20260827.37" charset="utf-8"></script>
     <script src="src/web-api-mock.js?v=20260827.37" charset="utf-8"></script>
-    <script src="src/web-pvp-offline.js?v=20260827.37" charset="utf-8"></script>
-    <script src="src/web-pvp-match.js?v=20260827.37" charset="utf-8"></script>
-    <script src="src/web-pvp-room-ui.js?v=20260827.37" charset="utf-8"></script>
+    <script src="src/web-pvp-offline.js?v=20260909.2" charset="utf-8"></script>
+    <script src="src/web-pvp-match.js?v=20260909.1" charset="utf-8"></script>
+    <script src="src/web-pvp-room-ui.js?v=20260909.2" charset="utf-8"></script>
     <script src="src/web-pvp-chat.js?v=20260907.8" charset="utf-8"></script>
     <script
       src="src/web-bundle-adapter.js?v=20260827.37"
