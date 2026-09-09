@@ -162022,6 +162022,86 @@ window.__require = (function e(t, o, n) {
                 function wireGuestPeer(peer) {
                   t._peer = peer;
                   var guestConnectTimer = null;
+                  var connectAttempt = 0;
+                  var isRandomJoin = !1;
+                  try {
+                    isRandomJoin = "1" === localStorage.getItem("pvp_is_random");
+                  } catch (e) {}
+                  function tryConnectToHost(hostId, attempt) {
+                    hostId = normalizeRoomCode(hostId);
+                    if (!/^\d{4}$/.test(hostId)) {
+                      failGuestJoin("Wrong room code");
+                      return;
+                    }
+                    r = hostId;
+                    sync.hostPeerId = hostId;
+                    connectAttempt = attempt || 0;
+                    try {
+                      if (t._conn && t._conn !== peer) {
+                        /* keep */
+                      }
+                      if (t._conn) {
+                        try {
+                          t._conn.close();
+                        } catch (eClose) {}
+                        t._conn = null;
+                      }
+                    } catch (e2) {}
+                    console.log(
+                      "[pvp-peerjs] guest connect →",
+                      hostId,
+                      "try",
+                      connectAttempt + 1,
+                    );
+                    var guestConn = peer.connect(hostId, {
+                      reliable: !0,
+                    });
+                    bindConn(guestConn);
+                    clearTimeout(guestConnectTimer);
+                    var waitMs = isRandomJoin ? 2800 : 3000;
+                    guestConnectTimer = setTimeout(function () {
+                      if (sync.connReady) return;
+                      if (isRandomJoin && connectAttempt < 10) {
+                        console.warn(
+                          "[pvp-peerjs] host not ready, retry",
+                          connectAttempt + 1,
+                          hostId,
+                        );
+                        try {
+                          guestConn.close();
+                        } catch (e3) {}
+                        tryConnectToHost(hostId, connectAttempt + 1);
+                        return;
+                      }
+                      failGuestJoin("Wrong room code");
+                    }, waitMs);
+                    var onGuestOpen = function () {
+                      clearTimeout(guestConnectTimer);
+                      s.PvpLogger.log("PeerJS connected to host", hostId);
+                      sync.connReady = !0;
+                      sendGuestHello();
+                    };
+                    guestConn.on("error", function () {
+                      if (sync.connReady) return;
+                      if (isRandomJoin && connectAttempt < 10) {
+                        clearTimeout(guestConnectTimer);
+                        console.warn(
+                          "[pvp-peerjs] connect error, retry",
+                          connectAttempt + 1,
+                        );
+                        setTimeout(function () {
+                          if (!sync.connReady)
+                            tryConnectToHost(hostId, connectAttempt + 1);
+                        }, 400);
+                        return;
+                      }
+                      clearTimeout(guestConnectTimer);
+                      if (!sync.connReady) failGuestJoin("Wrong room code");
+                    });
+                    guestConn.open
+                      ? onGuestOpen()
+                      : guestConn.on("open", onGuestOpen);
+                  }
                   peer.on("error", function (e) {
                     var typ = (e && e.type) || "";
                     s.PvpLogger.log("PeerJS peer error", e);
@@ -162030,6 +162110,18 @@ window.__require = (function e(t, o, n) {
                       "unavailable-id" === typ ||
                       "invalid-id" === typ
                     ) {
+                      if (isRandomJoin && connectAttempt < 10 && r) {
+                        console.warn(
+                          "[pvp-peerjs] peer-unavailable, retry soon",
+                          r,
+                        );
+                        clearTimeout(guestConnectTimer);
+                        setTimeout(function () {
+                          if (!sync.connReady)
+                            tryConnectToHost(r, connectAttempt + 1);
+                        }, 600);
+                        return;
+                      }
                       clearTimeout(guestConnectTimer);
                       failGuestJoin("Wrong room code");
                       return;
@@ -162059,33 +162151,43 @@ window.__require = (function e(t, o, n) {
                       }
                     } catch (pubErr) {}
                     if (!r) return;
-                    var guestConn = peer.connect(r, {
-                      reliable: !0,
-                    });
-                    bindConn(guestConn);
-                    guestConnectTimer = setTimeout(function () {
-                      if (!sync.connReady) {
-                        failGuestJoin("Wrong room code");
-                      }
-                    }, 3e3);
-                    var onGuestOpen = function () {
-                      clearTimeout(guestConnectTimer);
-                      s.PvpLogger.log("PeerJS connected to host", r);
-                      sync.connReady = !0;
-                      sendGuestHello();
-                    };
-                    guestConn.on("error", function () {
-                      clearTimeout(guestConnectTimer);
-                      if (!sync.connReady) failGuestJoin("Wrong room code");
-                    });
-                    guestConn.open
-                      ? onGuestOpen()
-                      : guestConn.on("open", onGuestOpen);
+                    tryConnectToHost(r, 0);
+                    if (isRandomJoin) {
+                      window.__pvpOnPeerExchange = function (data) {
+                        if (sync.connReady || !data) return;
+                        var hid = normalizeRoomCode(
+                          data.hostPeerId || data.roomCode || "",
+                        );
+                        if (/^\d{4}$/.test(hid) && hid !== String(r)) {
+                          console.log(
+                            "[pvp-peerjs] host id via socket →",
+                            hid,
+                          );
+                          tryConnectToHost(hid, 0);
+                        }
+                      };
+                    }
                   });
                 }
                 if ("host" === n) {
                   wireHostPeer._tries = 0;
-                  wireHostPeer(createPeer(genRoomCode()));
+                  var forcedId = "";
+                  try {
+                    forcedId = localStorage.getItem("pvp_forced_room") || "";
+                  } catch (e) {}
+                  forcedId = normalizeRoomCode(forcedId);
+                  if (!/^\d{4}$/.test(forcedId)) {
+                    forcedId = normalizeRoomCode(r);
+                  }
+                  if (/^\d{4}$/.test(forcedId)) {
+                    console.log(
+                      "[pvp-peerjs] HOST claiming matched room:",
+                      forcedId,
+                    );
+                    wireHostPeer(createPeer(forcedId));
+                  } else {
+                    wireHostPeer(createPeer(genRoomCode()));
+                  }
                 } else {
                   wireGuestPeer(createPeer());
                 }

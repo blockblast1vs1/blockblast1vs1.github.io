@@ -894,7 +894,8 @@
       global.__pvpRandomMatch = null;
       return {
         role: role,
-        hostId: role === "guest" ? hostPeer : null,
+        // Both roles need the room/host PeerJS id (host claims it, guest dials it)
+        hostId: hostPeer,
         random: true,
       };
     }
@@ -905,11 +906,10 @@
     if (!global.__pvpRandomPending) return Promise.resolve(null);
     global.__pvpRandomPending = false;
     return findMatch({ preferNativeUi: true }).then(function (result) {
+      var code = result.hostPeerId || result.roomCode;
       return {
         role: result.role,
-        hostId: result.role === "guest"
-          ? result.hostPeerId || result.roomCode
-          : null,
+        hostId: code || null,
         random: true,
       };
     });
