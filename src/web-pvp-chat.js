@@ -503,6 +503,7 @@
       return false;
     }
     lastSendAt = now;
+    if (!visible) setVisible(true);
     showBubble(msg, true);
     return true;
   }

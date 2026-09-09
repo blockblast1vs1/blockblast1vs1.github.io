@@ -161723,6 +161723,16 @@ window.__require = (function e(t, o, n) {
                     handleRemotePeerLeft(byeReason);
                     return;
                   }
+                  if ("chat" === msg.k) {
+                    try {
+                      if (typeof window.__pvpOnPeerChat === "function") {
+                        window.__pvpOnPeerChat(msg);
+                      }
+                    } catch (eChat) {
+                      s.PvpLogger.log("PeerSync chat fail", eChat);
+                    }
+                    return;
+                  }
                   if ("hello" === msg.k && "host" === sync.role) {
                     sync.guestUid = msg.uid;
                     sync.guestName = msg.name || "Guest";
@@ -161750,14 +161760,6 @@ window.__require = (function e(t, o, n) {
                     sync.hostUid = msg.hostUid || sync.hostUid;
                     sync._peerLeftHandled = !1;
                     console.log("[pvp-peerjs] Host ack, 2P sync ready");
-                    return;
-                  }
-                  if ("chat" === msg.k) {
-                    try {
-                      if (typeof window.__pvpOnPeerChat === "function") {
-                        window.__pvpOnPeerChat(msg);
-                      }
-                    } catch (eChat) {}
                     return;
                   }
                   if ("s2c" === msg.k && "guest" === sync.role && sock) {
