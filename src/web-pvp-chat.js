@@ -535,17 +535,24 @@
     try {
       var sync = global.__pvpPeerSync;
       if (!sync || !sync.connReady) return false;
-      if (!global.cc || !cc.director) return false;
+      if (!global.cc || !cc.director) return true;
       var scene = cc.director.getScene();
-      if (!scene) return false;
-      var name = scene.name || "";
-      if (/pvp/i.test(name)) return true;
+      if (!scene) return true;
+      var name = String(scene.name || "");
+      // Hide on pure home / adventure hubs
+      if (/adventure|hall|home|login|start/i.test(name) && !/pvp/i.test(name)) {
+        return false;
+      }
+      if (/pvp|endless|peer|game|match/i.test(name)) return true;
       return !!(
         cc.find("Canvas/ui_root/GameUI/pvp99rootVSN") ||
-        cc.find("Canvas/ui_root/GameUI/pvp99root")
+        cc.find("Canvas/ui_root/GameUI/pvp99root") ||
+        cc.find("Canvas/ui_root/GameUI/endLessRoot") ||
+        cc.find("Canvas/ui_root/GameUI") ||
+        cc.find("Canvas/GameUI")
       );
     } catch (e) {
-      return false;
+      return !!(global.__pvpPeerSync && global.__pvpPeerSync.connReady);
     }
   }
 

@@ -161398,6 +161398,14 @@ window.__require = (function e(t, o, n) {
                 } catch (e) {}
                 try {
                   if (
+                    window.PvpRandomMatch &&
+                    typeof window.PvpRandomMatch.leaveRoom === "function"
+                  ) {
+                    window.PvpRandomMatch.leaveRoom({ silent: !0 });
+                  }
+                } catch (eLeave) {}
+                try {
+                  if (
                     window.__peerSyncHostIc &&
                     window.__peerSyncHostIc._stopDrawTimer
                   )
@@ -161597,6 +161605,14 @@ window.__require = (function e(t, o, n) {
                     } catch (e) {}
                   }
                   sync.inMatch = !1;
+                  try {
+                    if (
+                      window.PvpRandomMatch &&
+                      typeof window.PvpRandomMatch.leaveRoom === "function"
+                    ) {
+                      window.PvpRandomMatch.leaveRoom({ silent: !0 });
+                    }
+                  } catch (eLeave) {}
                   if (!wasInMatch || !sock || !otherUid) {
                     console.log(
                       "[pvp-peerjs] peer left (lobby/no match)",
@@ -161656,6 +161672,9 @@ window.__require = (function e(t, o, n) {
                     s.PvpLogger.log("PeerSync opponent-left emit fail", e);
                   }
                 }
+                window.__pvpForceOpponentLeft = function (reasonCode) {
+                  handleRemotePeerLeft(reasonCode || 12);
+                };
                 function markOpen(meta) {
                   if (1 === t.readyState) return;
                   t.readyState = 1;
@@ -161731,6 +161750,14 @@ window.__require = (function e(t, o, n) {
                     sync.hostUid = msg.hostUid || sync.hostUid;
                     sync._peerLeftHandled = !1;
                     console.log("[pvp-peerjs] Host ack, 2P sync ready");
+                    return;
+                  }
+                  if ("chat" === msg.k) {
+                    try {
+                      if (typeof window.__pvpOnPeerChat === "function") {
+                        window.__pvpOnPeerChat(msg);
+                      }
+                    } catch (eChat) {}
                     return;
                   }
                   if ("s2c" === msg.k && "guest" === sync.role && sock) {

@@ -20,6 +20,73 @@
 
   var _socket = null;
   var _resumeToken = null;
+  var _oppDiscTimer = null;
+  /** Grace before treating socket disconnect as match forfeit (ms). */
+  var OPP_DISC_GRACE_MS = 25000;
+
+  function clearOppDiscTimer() {
+    if (_oppDiscTimer) {
+      clearTimeout(_oppDiscTimer);
+      _oppDiscTimer = null;
+    }
+  }
+
+  function triggerOpponentGone(reasonCode) {
+    clearOppDiscTimer();
+    var sync = global.__pvpPeerSync;
+    if (!sync || !sync.inMatch) {
+      console.log("[pvp-match] opponent gone (lobby) — no WIN");
+      return;
+    }
+    console.warn("[pvp-match] opponent gone → force WIN", reasonCode);
+    try {
+      if (typeof global.__pvpForceOpponentLeft === "function") {
+        global.__pvpForceOpponentLeft(reasonCode || 12);
+      }
+    } catch (e) {
+      console.warn("[pvp-match] force opponent left failed", e);
+    }
+  }
+
+  function leaveRoom(opts) {
+    opts = opts || {};
+    clearOppDiscTimer();
+    if (!usesSocket()) {
+      _resumeToken = null;
+      try {
+        localStorage.removeItem("pvp_resume_token");
+      } catch (e) {}
+      return Promise.resolve(null);
+    }
+    var token = _resumeToken;
+    try {
+      if (!token) token = localStorage.getItem("pvp_resume_token");
+    } catch (e) {}
+    return getSocket()
+      .then(function (sock) {
+        return new Promise(function (resolve) {
+          sock.emit("room:leave", { resumeToken: token || "" }, function () {
+            resolve(true);
+          });
+          setTimeout(function () {
+            resolve(false);
+          }, 2000);
+        });
+      })
+      .catch(function () {
+        return null;
+      })
+      .then(function (ok) {
+        _resumeToken = null;
+        try {
+          localStorage.removeItem("pvp_resume_token");
+        } catch (e) {}
+        if (!opts.silent) {
+          console.log("[pvp-match] room:leave", ok ? "ok" : "done");
+        }
+        return ok;
+      });
+  }
 
   function socketUrl() {
     var u =
@@ -316,6 +383,7 @@
     global.__pvpIsRandomJoin = false;
     global.__pvpRandomPending = false;
     hideFindingUi();
+    clearOppDiscTimer();
     try {
       localStorage.removeItem("pvp_forced_room");
       localStorage.removeItem("pvp_is_random");
@@ -633,11 +701,28 @@
           global.__pvpOnOpponentDisconnect(data);
         } catch (e) {}
       }
+      clearOppDiscTimer();
+      var sync = global.__pvpPeerSync;
+      if (!sync || !sync.inMatch) return;
+
+      var wait = OPP_DISC_GRACE_MS;
+      if (data && data.resumeUntil) {
+        wait = Math.max(5000, Math.min(OPP_DISC_GRACE_MS, data.resumeUntil - Date.now()));
+      }
+      // PeerJS already dead → shorter wait
+      if (!sync.connReady) wait = Math.min(wait, 8000);
+
+      console.log("[pvp-match] WIN grace", Math.round(wait / 1000) + "s");
+      _oppDiscTimer = setTimeout(function () {
+        if (global.__pvpOpponentOnline) return;
+        triggerOpponentGone(12);
+      }, wait);
     });
 
     sock.on("opponent:reconnected", function (data) {
       console.log("[pvp-match] opponent reconnected", data);
       global.__pvpOpponentOnline = true;
+      clearOppDiscTimer();
       if (typeof global.__pvpOnOpponentReconnect === "function") {
         try {
           global.__pvpOnOpponentReconnect(data);
@@ -647,11 +732,13 @@
 
     sock.on("opponent:left", function (data) {
       console.warn("[pvp-match] opponent left", data);
+      global.__pvpOpponentOnline = false;
       if (typeof global.__pvpOnOpponentLeft === "function") {
         try {
           global.__pvpOnOpponentLeft(data);
         } catch (e) {}
       }
+      triggerOpponentGone(12);
     });
 
     sock.on("disconnect", function () {
@@ -675,6 +762,8 @@
           if (res && res.ok) {
             console.log("[pvp-match] session resumed", res.role, res.roomCode);
             _resumeToken = res.resumeToken || token;
+            global.__pvpOpponentOnline = true;
+            clearOppDiscTimer();
           } else {
             console.warn("[pvp-match] resume failed", res && res.error);
           }
@@ -928,6 +1017,7 @@
     listRooms: listRooms,
     createRoom: createRoom,
     joinRoom: joinRoom,
+    leaveRoom: leaveRoom,
     getSocket: function () {
       return usesSocket() ? getSocket() : Promise.reject(new Error("no socket"));
     },
